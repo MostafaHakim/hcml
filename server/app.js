@@ -16,9 +16,22 @@ const demandRoute = require("./router/demand.route");
 const colorPriceRoute = require("./router/colorPrice.route");
 const griegeIn = require("./router/griegein.route");
 
-app.use(cors());
-app.use(express.json());
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
+
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("Welcome");
@@ -31,20 +44,6 @@ app.use("/vendor", vendorsRoute);
 app.use("/demand", demandRoute);
 app.use("/colorprice", colorPriceRoute);
 app.use("/griegein", griegeIn);
-
-mongoose
-  .connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .catch((err) => console.error("❌ Initial DB Connection Error:", err));
-
-mongoose.connection.once("open", () => {
-  console.log("✅ DB Connected Successfully");
-});
-mongoose.connection.on("error", (err) => {
-  console.error("❌ DB Connection Error:", err);
-});
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running at PORT ${PORT}`);
