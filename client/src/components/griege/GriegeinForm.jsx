@@ -46,7 +46,7 @@ export default function LotEntryForm() {
     };
 
     try {
-      const response = await fetch("https://hcml-ry8s.vercel.app//griegein", {
+      const response = await fetch("https://hcml-ry8s.vercel.app/griegein", {
         method: "POST",
         body: JSON.stringify(payload),
         headers: {
