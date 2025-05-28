@@ -8,9 +8,7 @@ const DyesDemandForm = () => {
   useEffect(() => {
     const getColorData = async () => {
       try {
-        const res = await fetch(
-          "https://script.google.com/macros/s/AKfycby0mRlZIXzT8quaX3rnthIKAh4Pur1B6CzEPnugZsMhWtmEELcoVgfQQfgB567dHcVhVw/exec?action=getcolorprice"
-        );
+        const res = await fetch("https://hcml-ry8s.vercel.app/colorprice");
         const data = await res.json();
         setColorPrice(data);
       } catch (error) {
@@ -63,14 +61,11 @@ const DyesDemandForm = () => {
       costPerGaj: costPerGaj.toFixed(2),
     };
 
-    fetch(
-      "https://script.google.com/macros/s/AKfycby0mRlZIXzT8quaX3rnthIKAh4Pur1B6CzEPnugZsMhWtmEELcoVgfQQfgB567dHcVhVw/exec?action=addcolordemand",
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "application/json" },
-      }
-    )
+    fetch("https://hcml-ry8s.vercel.app/demand", {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" },
+    })
       .then((res) => res.json())
       .then((result) => {
         setLoading(false);
