@@ -19,7 +19,7 @@ const ColorPurchaseForm = () => {
   useEffect(() => {
     const fetchColorMap = async () => {
       try {
-        const res = await fetch("http://localhost:4000/color");
+        const res = await fetch("https://hcml-ry8s.vercel.app/color");
         const data = await res.json();
         setColorMap(data);
       } catch (error) {
@@ -32,7 +32,7 @@ const ColorPurchaseForm = () => {
   useEffect(() => {
     const getVendorData = async () => {
       try {
-        const res = await fetch("http://localhost:4000/vendor");
+        const res = await fetch("https://hcml-ry8s.vercel.app/vendor");
         const data = await res.json();
         setVendorMap(data);
       } catch (error) {
@@ -65,7 +65,7 @@ const ColorPurchaseForm = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:4000/proxy", {
+      const response = await fetch("https://hcml-ry8s.vercel.app/proxy", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
