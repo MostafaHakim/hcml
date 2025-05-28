@@ -6,7 +6,7 @@ const fetch = require("node-fetch");
 const app = express();
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 const partyRoute = require("./router/party.route");
 const dyesRoute = require("./router/dyes.route");
