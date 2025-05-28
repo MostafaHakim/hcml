@@ -7,7 +7,7 @@ import { RiAdminFill } from "react-icons/ri";
 function Nav() {
   return (
     <div className="w-full">
-      <ul className="flex flex-row items-center justify-center space-x-12 text-white text-xs font-semibold">
+      <ul className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-x-12 text-white text-xs font-semibold">
         <Link
           to="/dashboard"
           className="w-20 h-20  ring-2 ring-sky-700 hover:ring-rose-500 flex flex-col items-center justify-between shadow-md bg-[#0a3d62] bg-opacity-60 p-1 rounded-md hover:w-24 hover:h-24 transition-all duration-300 hover:"

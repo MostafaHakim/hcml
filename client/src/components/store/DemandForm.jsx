@@ -83,9 +83,9 @@ const DyesDemandForm = () => {
   };
 
   return (
-    <div className="w-full p-4 grid grid-cols-11">
-      <div className="col-span-3"></div>
-      <div className="w-full col-span-5 mx-auto p-4 text-black relative bg-white  rounded-lg shadow-md">
+    <div className="w-full p-4 grid md:grid-cols-11">
+      <div className=" col-span-1 md:col-span-3"></div>
+      <div className="w-full col-span-1 md:col-span-5 mx-auto p-4 text-black relative bg-white  rounded-lg shadow-md">
         {/* Loading Overlay */}
         {loading && (
           <div className="absolute inset-0 bg-white bg-opacity-40 flex items-center justify-center z-10">
@@ -99,7 +99,7 @@ const DyesDemandForm = () => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Batch Info */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input type="date" {...register("date")} className="input" />
             <input
               placeholder="Memo No"
@@ -163,7 +163,10 @@ const DyesDemandForm = () => {
           <div className="border p-4 rounded-md">
             <h2 className="font-semibold mb-2">Colors</h2>
             {fields.map((item, index) => (
-              <div key={item.id} className="grid grid-cols-4 gap-2 mb-2">
+              <div
+                key={item.id}
+                className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2"
+              >
                 <select
                   {...register(`colors.${index}.colorName`)}
                   className="input"
@@ -222,7 +225,7 @@ const DyesDemandForm = () => {
 
         {response && <p className="mt-4 font-semibold">Status: {response}</p>}
       </div>
-      <div className="col-span-3"></div>
+      <div className="col-span-1 md:col-span-3"></div>
     </div>
   );
 };
