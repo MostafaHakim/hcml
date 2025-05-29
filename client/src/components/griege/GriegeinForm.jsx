@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { useState } from "react";
 
 export default function LotEntryForm() {
+  const [lotData, setLotData] = useState([]);
   const [form, setForm] = useState({
     lotNo: "",
     date: "",
@@ -21,6 +23,19 @@ export default function LotEntryForm() {
     "Packing",
   ];
 
+  useEffect(() => {
+    const getLotData = async () => {
+      try {
+        const res = await fetch("https://hcml-ry8s.vercel.app/griegein");
+        const data = await res.json();
+        setLotData(data);
+      } catch (error) {
+        console.error("Failed to fetch colors:", error);
+      }
+    };
+    getLotData();
+  }, []);
+  console.log(lotData);
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
