@@ -8,7 +8,9 @@ const DyesDemandForm = () => {
   useEffect(() => {
     const getColorData = async () => {
       try {
-        const res = await fetch("http://localhost:4000/colorprice");
+        const res = await fetch(
+          "https://script.google.com/macros/s/AKfycby0mRlZIXzT8quaX3rnthIKAh4Pur1B6CzEPnugZsMhWtmEELcoVgfQQfgB567dHcVhVw/exec?action=getcolorprice"
+        );
         const data = await res.json();
         setColorPrice(data);
       } catch (error) {
