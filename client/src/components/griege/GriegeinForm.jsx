@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 export default function LotEntryForm() {
-  const [lotData, setLotData] = useState([]);
+  const [lotData, setLotData] = useState({});
   const [form, setForm] = useState({
     lotNo: "",
     date: "",
