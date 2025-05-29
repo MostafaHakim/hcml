@@ -1,12 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-const GAS_BASE_URL =
-  "https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec";
-
 router.get("/", async (req, res) => {
   try {
-    const response = await fetch(GAS_BASE_URL); //hoy na
+    const response = await fetch(
+      "https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getlotdata"
+    ); //hoy na
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -17,13 +16,16 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const response = await fetch(`${GAS_BASE_URL}?action=addnewlot`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(req.body),
-    });
+    const response = await fetch(
+      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=addnewlot`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(req.body),
+      }
+    );
 
     const text = await response.text();
     res.send(text);
