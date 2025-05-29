@@ -142,7 +142,11 @@ export default function LotEntryForm() {
         required
         className="border p-2 w-full"
       />
-      <datalist id="partyNameList"></datalist>
+      <datalist id="partyNameList">
+        {partyList.map((item) => {
+          return <option key={i} velue={item} />;
+        })}
+      </datalist>
       <input
         name="fabric"
         value={form.fabric}
