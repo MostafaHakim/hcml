@@ -4,7 +4,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const response = await fetch(
-      "https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getlotinfo"
+      "https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=lotinfo"
     );
     const data = await response.json();
     res.json(data);
