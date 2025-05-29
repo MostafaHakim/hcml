@@ -144,7 +144,7 @@ export default function LotEntryForm() {
       />
       <datalist id="partyNameListOptions">
         {partyListOptions.map((item,i) => {
-          return <option key={i} velue={item} />;
+          return <option key={i} value={item} />;
         })}
       </datalist>
       <input
