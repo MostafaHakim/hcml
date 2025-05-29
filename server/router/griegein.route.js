@@ -6,12 +6,12 @@ const GAS_BASE_URL =
 
 router.get("/", async (req, res) => {
   try {
-    const response = await fetch(`${GAS_BASE_URL}?action=getlotdata`); //hoy na
+    const response = await fetch(GAS_BASE_URL); //hoy na
     const data = await response.json();
     res.json(data);
   } catch (error) {
     console.error("Error fetching colors:", error);
-    res.status(500).json({ error: "Failed to get color list" });
+    res.status(500).json({ error: "Failed to get lot list" });
   }
 });
 
