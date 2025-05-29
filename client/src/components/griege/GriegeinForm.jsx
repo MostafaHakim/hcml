@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export default function LotEntryForm() {
-  const [partyList, setPartyList] = useState([]);
+  const [partyListOptions, setPartyListOptions] = useState([]);
   const [form, setForm] = useState({
     lotNo: "",
     date: "",
@@ -42,7 +42,7 @@ export default function LotEntryForm() {
       try {
         const res = await fetch("https://hcml-ry8s.vercel.app/party");
         const data = await res.json();
-        setPartyList(data);
+        setPartyListOptions(data);
       } catch (error) {
         console.error("Failed to fetch lot data:", error);
       }
@@ -51,7 +51,7 @@ export default function LotEntryForm() {
     getAllParty();
   }, []);
 
-  console.log(partyList);
+  console.log(partyListOptions);
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -135,14 +135,14 @@ export default function LotEntryForm() {
       <input
         type="text"
         name="party"
-        list="partyNameList"
+        list="partyNameListOptions"
         value={form.party}
         onChange={handleChange}
         placeholder="Party Name"
         required
         className="border p-2 w-full"
       />
-      <datalist id="partyNameList">
+      <datalist id="partyNameListOptions">
         {partyList.map((item,i) => {
           return <option key={i} velue={item} />;
         })}
