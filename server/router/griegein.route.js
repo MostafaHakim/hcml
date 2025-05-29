@@ -6,7 +6,7 @@ const GAS_BASE_URL =
 
 router.get("/", async (req, res) => {
   try {
-    const response = await fetch(`${GAS_BASE_URL}?action=getlotdata`);
+    const response = await fetch(`${GAS_BASE_URL}?action=getlotdata`); //hoy na
     const data = await response.json();
     res.json(data);
   } catch (error) {
