@@ -63,11 +63,14 @@ const DyesDemandForm = () => {
       costPerGaj: costPerGaj.toFixed(2),
     };
 
-    fetch("http://localhost:4000/demand", {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: { "Content-Type": "application/json" },
-    })
+    fetch(
+      "https://script.google.com/macros/s/AKfycby0mRlZIXzT8quaX3rnthIKAh4Pur1B6CzEPnugZsMhWtmEELcoVgfQQfgB567dHcVhVw/exec?action=addcolordemand",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" },
+      }
+    )
       .then((res) => res.json())
       .then((result) => {
         setLoading(false);
