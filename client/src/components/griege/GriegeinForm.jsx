@@ -100,7 +100,7 @@ export default function LotEntryForm() {
 
       <input
         name="lotNo"
-        value={form.lotNo}
+        value={lotData ? lotData : "refresh page for lot number"}
         onChange={handleChange}
         placeholder="Lot Number"
         required
