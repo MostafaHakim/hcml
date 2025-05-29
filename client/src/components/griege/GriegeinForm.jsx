@@ -193,7 +193,6 @@
 import { useEffect, useState } from "react";
 
 export default function LotEntryForm() {
-  const [lotData, setLotData] = useState([]);
   const [form, setForm] = useState({
     lotNo: "",
     date: "",
@@ -215,23 +214,18 @@ export default function LotEntryForm() {
   ];
 
   useEffect(() => {
-    const getLotData = async () => {
+    const getNextLotNo = async () => {
       try {
-        const res = await fetch("https://hcml-ry8s.vercel.app/griegein");
+        const res = await fetch("https://your-script-url/exec?action=lotinfo");
         const data = await res.json();
-        setLotData(data);
-
-        // সর্বোচ্চ লট নাম্বার বের করে +1 করে ফর্মে সেট করি
-        const lotNumbers = data
-          .map((item) => parseInt(item.lotNo))
-          .filter((num) => !isNaN(num));
-        const maxLot = lotNumbers.length > 0 ? Math.max(...lotNumbers) : 0;
-        setForm((prev) => ({ ...prev, lotNo: String(maxLot + 1) }));
+        const nextLot = parseInt(data) + 1;
+        setForm((prev) => ({ ...prev, lotNo: nextLot.toString() }));
       } catch (error) {
         console.error("Failed to fetch lot data:", error);
       }
     };
-    getLotData();
+
+    getNextLotNo();
   }, []);
 
   const handleChange = (e) => {
@@ -270,14 +264,9 @@ export default function LotEntryForm() {
       const result = await response.json();
       if (result.result === "success") {
         alert("Data saved successfully!");
-        // নতুন লট নাম্বার দিয়ে ফর্ম রিসেট
-        const lotNumbers = lotData
-          .map((item) => parseInt(item.lotNo))
-          .filter((num) => !isNaN(num));
-        const maxLot = lotNumbers.length > 0 ? Math.max(...lotNumbers) + 1 : 1;
-
+        // reset form, except lotNo (could refresh next lot here if needed)
         setForm({
-          lotNo: String(maxLot),
+          lotNo: "", // or set next lot again
           date: "",
           party: "",
           fabric: "",
@@ -309,6 +298,7 @@ export default function LotEntryForm() {
         placeholder="Lot Number"
         required
         className="border p-2 w-full"
+        readOnly
       />
       <input
         type="date"
