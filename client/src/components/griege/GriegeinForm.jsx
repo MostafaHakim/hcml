@@ -216,7 +216,7 @@ export default function LotEntryForm() {
   useEffect(() => {
     const getNextLotNo = async () => {
       try {
-        const res = await fetch("https://your-script-url/exec?action=lotinfo");
+        const res = await fetch("https://hcml-ry8s.vercel.app/griegein");
         const data = await res.json();
         const nextLot = parseInt(data) + 1;
         setForm((prev) => ({ ...prev, lotNo: nextLot.toString() }));
