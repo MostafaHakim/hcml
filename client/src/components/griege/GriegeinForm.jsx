@@ -133,19 +133,16 @@ export default function LotEntryForm() {
         className="border p-2 w-full"
       />
       <input
-        list="partyNameList"
+        type="text"
         name="party"
+        list="partyNameList"
         value={form.party}
         onChange={handleChange}
         placeholder="Party Name"
         required
         className="border p-2 w-full"
       />
-      <datalist id="partyNameList">
-        {partyList.map((party, i) => {
-          <option key={i} value={party} />;
-        })}
-      </datalist>
+      <datalist id="partyNameList"></datalist>
       <input
         name="fabric"
         value={form.fabric}
