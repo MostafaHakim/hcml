@@ -31,7 +31,7 @@ const DyesDemandForm = () => {
       }
     };
     getColorData();
-  }, []);
+  }, [colorPrice]);
 
   const {
     register,
@@ -229,7 +229,7 @@ const DyesDemandForm = () => {
   const getWarningMessage = useCallback(() => {
     const messages = [];
 
-    if (lotStatus.Dyeing > lotStatus.initialQty) {
+    if (lotStatus.Dyeing + parseInt(watchQty) > lotStatus.initialQty) {
       messages.push(
         `Dyeing demand exceeded! (${lotStatus.Dyeing.toFixed(
           2
@@ -428,7 +428,7 @@ const DyesDemandForm = () => {
           </h2>
           <div className="w-full">
             <div className="font-bold mb-2 p-2 bg-gray-200 rounded">
-              Lot: {watchLot || "N/A"}
+              Lot Number: {watchLot || "N/A"}
             </div>
 
             <div className="flex justify-between w-full p-2 border-b">
