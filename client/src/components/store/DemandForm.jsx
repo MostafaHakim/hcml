@@ -253,6 +253,7 @@ import { v4 as uuidv4 } from "uuid";
 const DyesDemandForm = () => {
   const [colorPrice, setColorPrice] = useState({});
   const [demandData, setDemandData] = useState([]);
+  const [verifyDyes, setVerifyDyes] = useState([]);
 
   // 获取需求数据
   useEffect(() => {
@@ -307,6 +308,14 @@ const DyesDemandForm = () => {
 
   const watchColors = watch("colors");
   const watchLot = watch("lot");
+
+  useEffect(() => {
+    fetch("https://hcml-ry8s.vercel.app/demand/verifydyes")
+      .then((res) => res.json())
+      .then((data) => setVerifyDyes(data));
+  }, []);
+
+  console.log(verifyDyes);
 
   // 颜色选择时自动更新价格
   useEffect(() => {
@@ -396,7 +405,7 @@ const DyesDemandForm = () => {
   };
 
   return (
-    <div className="w-full p-4 grid md:grid-cols-11">
+    <div className="w-full p-4 grid md:grid-cols-11 gap-4">
       <div className="col-span-1 md:col-span-3"></div>
       <div className="w-full col-span-1 md:col-span-5 mx-auto p-4 text-black relative bg-white rounded-lg shadow-md">
         {loading && (
@@ -548,7 +557,24 @@ const DyesDemandForm = () => {
 
         {response && <p className="mt-4 font-semibold">Status: {response}</p>}
       </div>
-      <div className="col-span-1 md:col-span-3"></div>
+      <div className="col-span-1 md:col-span-3 p-4 bg-white text-black rounded-lg">
+        <div className="w-full flax flex-col items-center justify-center space-y-4">
+          <h2 className="text-2xl font-serif px-8 py-2 bg-pink-800 rounded-full text-white">
+            Lot Status
+          </h2>
+          <ul className="flex flex-col items-start justify-center p-4 text-xl space-y-3 uppercase">
+            <li>
+              Dying:<span>1000</span>
+            </li>
+            <li>
+              Printing:<span>1500</span>
+            </li>
+            <li>
+              Finishing:<span>2000</span>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };
