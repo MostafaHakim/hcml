@@ -4,7 +4,20 @@ import { v4 as uuidv4 } from "uuid";
 
 const DyesDemandForm = () => {
   const [colorPrice, setColorPrice] = useState({});
+  const [demandData, setDemandData] = useState({});
 
+  useEffect(() => {
+    const getDemandData = async () => {
+      try {
+        const res = await fetch("https://hcml-ry8s.vercel.app/demand");
+        const data = await res.json();
+        setColorPrice(data);
+      } catch (error) {
+        console.error("Failed to fetch colors:", error);
+      }
+    };
+    getDemandData();
+  }, [demandData]);
   useEffect(() => {
     const getColorData = async () => {
       try {

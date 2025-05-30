@@ -51,7 +51,6 @@ export default function LotEntryForm() {
     getAllParty();
   }, []);
 
-  console.log(partyListOptions);
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -133,20 +132,20 @@ export default function LotEntryForm() {
         className="border p-2 w-full"
       />
       <input
-  type="text"
-  name="party"
-  list="partyNameListOptions"
-  value={form.party}
-  onChange={handleChange}
-  placeholder="Party Name"
-  required
-  className="border p-2 w-full"
-/>
-<datalist id="partyNameListOptions">
-  {[...new Set(partyListOptions)].sort().map(item => (
-    <option key={item} value={item} />
-  ))}
-</datalist>
+        type="text"
+        name="party"
+        list="partyNameListOptions"
+        value={form.party}
+        onChange={handleChange}
+        placeholder="Party Name"
+        required
+        className="border p-2 w-full"
+      />
+      <datalist id="partyNameListOptions">
+        {[...new Set(partyListOptions)].sort().map((item) => (
+          <option key={item} value={item} />
+        ))}
+      </datalist>
 
       <input
         name="fabric"
