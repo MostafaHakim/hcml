@@ -254,7 +254,7 @@ const DyesDemandForm = () => {
     }
 
     return messages.join("\n");
-  }, [lotStatus]);
+  }, [lotStatus,watchQty]);
 
   return (
     <div className="w-full p-4 grid md:grid-cols-11 gap-4">
