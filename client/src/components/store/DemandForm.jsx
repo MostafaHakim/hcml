@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 
@@ -145,6 +145,36 @@ const DyesDemandForm = () => {
         console.error(err);
       });
   };
+
+  const lotStatus = useMemo(() => {
+    const status = {
+      Dyeing: 0,
+      Printing: 0,
+      Finishing: 0,
+    };
+
+    if (!watchLot || verifyDyes.length === 0) return status;
+
+    // Get column indexes from header
+    const header = verifyDyes[0];
+    const workTypeIndex = header.indexOf("Work Type");
+    const qtyIndex = header.indexOf("Qty");
+    const lotIndex = header.indexOf("Lot No");
+
+    // Sum quantities by work type for the current lot
+    verifyDyes.slice(1).forEach((row) => {
+      if (String(row[lotIndex]) === String(watchLot)) {
+        const workType = row[workTypeIndex];
+        const quantity = parseFloat(row[qtyIndex]) || 0;
+
+        if (workType === "Dyeing") status.Dyeing += quantity;
+        else if (workType === "Printing") status.Printing += quantity;
+        else if (workType === "Finishing") status.Finishing += quantity;
+      }
+    });
+
+    return status;
+  }, [watchLot, verifyDyes]);
 
   return (
     <div className="w-full p-4 grid md:grid-cols-11 gap-4">
@@ -299,21 +329,37 @@ const DyesDemandForm = () => {
         {response && <p className="mt-4 font-semibold">Status: {response}</p>}
       </div>
       <div className="col-span-1 md:col-span-3 p-4 bg-white text-black rounded-lg">
-        <div className="w-full flax flex-col items-center justify-center space-y-4">
-          <h2 className="text-2xl font-serif px-8 py-2 bg-pink-800 rounded-full text-white">
-            Lot Status
-          </h2>
-          <ul className="flex flex-col items-start justify-center p-4 text-xl space-y-3 uppercase">
-            {/* <li>
-              Dying:<span>1000</span>
-            </li>
-            <li>
-              Printing:<span>1500</span>
-            </li>
-            <li>
-              Finishing:<span>2000</span>
-            </li> */}
-          </ul>
+        <div className="col-span-1 md:col-span-3 p-4 bg-white text-black rounded-lg">
+          <div className="w-full flex flex-col items-center justify-center space-y-4">
+            <h2 className="text-2xl font-serif px-8 py-2 bg-pink-800 rounded-full text-white">
+              Lot Status
+            </h2>
+            <div className="w-full">
+              <div className="font-bold mb-2 p-2 bg-gray-200 rounded">
+                Lot: {watchLot || "N/A"}
+              </div>
+              <ul className="flex flex-col items-start justify-center p-4 text-xl space-y-3 uppercase">
+                <li className="flex justify-between w-full">
+                  <span>Dyeing:</span>
+                  <span className="font-bold">
+                    {lotStatus.Dyeing.toFixed(2)}
+                  </span>
+                </li>
+                <li className="flex justify-between w-full">
+                  <span>Printing:</span>
+                  <span className="font-bold">
+                    {lotStatus.Printing.toFixed(2)}
+                  </span>
+                </li>
+                <li className="flex justify-between w-full">
+                  <span>Finishing:</span>
+                  <span className="font-bold">
+                    {lotStatus.Finishing.toFixed(2)}
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
