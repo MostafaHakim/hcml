@@ -226,48 +226,108 @@ const DyesDemandForm = () => {
     return true;
   };
 
+  // const getWarningMessage = useCallback(() => {
+  //   const messages = [];
+
+  //   if (
+  //     watchWorkType === "Dyeing" &&
+  //     lotStatus.Dyeing + parseInt(watchQty) > lotStatus.initialQty
+  //   ) {
+  //     messages.push(
+  //       `এই লটে গ্রে ডাইং বাকি আছে ${
+  //         lotStatus.initialQty - lotStatus.Dyeing
+  //       } গজ এখন পর্যন্ত ডাইং হয়েছে  ${lotStatus.Dyeing.toFixed(2)} গজ`
+  //     );
+  //   }
+
+  //   if (
+  //     watchWorkType === "Printing" &&
+  //     lotStatus.Printing + parseInt(watchQty) > lotStatus.initialQty
+  //   ) {
+  //     messages.push(
+  //       `Printing demand exceeded! (${lotStatus.Printing.toFixed(
+  //         2
+  //       )} > ${lotStatus.initialQty.toFixed(2)})`
+  //     );
+  //   }
+
+  //   if (
+  //     watchWorkType === "Finishing" &&
+  //     lotStatus.Finishing + parseInt(watchQty) > lotStatus.initialQty
+  //   ) {
+  //     messages.push(
+  //       `Finishing demand exceeded! (${lotStatus.Finishing.toFixed(
+  //         2
+  //       )} > ${lotStatus.initialQty.toFixed(2)})`
+  //     );
+  //   }
+
+  //   return messages.join("\n");
+  // }, [lotStatus, watchQty]);
+
   const getWarningMessage = useCallback(() => {
     const messages = [];
+    const qty = parseInt(watchQty);
 
-    if (
-      watchWorkType === "Dyeing" &&
-      lotStatus.Dyeing + parseInt(watchQty) > lotStatus.initialQty
-    ) {
-      messages.push(
-        `এই লটে গ্রে ডাইং বাকি আছে ${
-          lotStatus.initialQty - lotStatus.Dyeing
-        } গজ এখন পর্যন্ত ডাইং হয়েছে  ${lotStatus.Dyeing.toFixed(2)} গজ`
-      );
-    } else {
-      messages.push(
-        `গ্রে ডাইং বাকি আছে ${lotStatus.initialQty - lotStatus.Dyeing} গজ`
-      );
-    }
+    switch (watchWorkType) {
+      case "Dyeing":
+        if (lotStatus.Dyeing + qty > lotStatus.initialQty) {
+          messages.push(
+            `এই লটে গ্রে ডাইং বাকি আছে ${
+              lotStatus.initialQty - lotStatus.Dyeing
+            } গজ। এখন পর্যন্ত ডাইং হয়েছে ${lotStatus.Dyeing.toFixed(2)} গজ`
+          );
+        } else {
+          messages.push(
+            `এই লটে গ্রে ডাইং বাকি আছে ${
+              lotStatus.initialQty - lotStatus.Dyeing
+            }`
+          );
+        }
+        break;
 
-    if (
-      watchWorkType === "Printing" &&
-      lotStatus.Printing + parseInt(watchQty) > lotStatus.initialQty
-    ) {
-      messages.push(
-        `Printing demand exceeded! (${lotStatus.Printing.toFixed(
-          2
-        )} > ${lotStatus.initialQty.toFixed(2)})`
-      );
-    }
+      case "Printing":
+        if (lotStatus.Printing + qty > lotStatus.initialQty) {
+          messages.push(
+            `এই লটে গ্রে প্রিন্টিং বাকি আছে ${
+              lotStatus.initialQty - lotStatus.Printing
+            } গজ। এখন পর্যন্ত প্রিন্টিং হয়েছে ${lotStatus.Printing.toFixed(
+              2
+            )} গজ`
+          );
+        } else {
+          messages.push(
+            `এই লটে গ্রে প্রিন্টিং বাকি আছে ${
+              lotStatus.initialQty - lotStatus.Printing
+            }`
+          );
+        }
+        break;
 
-    if (
-      watchWorkType === "Finishing" &&
-      lotStatus.Finishing + parseInt(watchQty) > lotStatus.initialQty
-    ) {
-      messages.push(
-        `Finishing demand exceeded! (${lotStatus.Finishing.toFixed(
-          2
-        )} > ${lotStatus.initialQty.toFixed(2)})`
-      );
+      case "Finishing":
+        if (lotStatus.Finishing + qty > lotStatus.initialQty) {
+          messages.push(
+            `এই লটে গ্রে ফিনিশিং বাকি আছে ${
+              lotStatus.initialQty - lotStatus.Finishing
+            } গজ। এখন পর্যন্ত ফিনিশিং হয়েছে ${lotStatus.Finishing.toFixed(
+              2
+            )} গজ`
+          );
+        } else {
+          messages.push(
+            `এই লটে গ্রে ফিনিশিং বাকি আছে ${
+              lotStatus.initialQty - lotStatus.Finishing
+            }`
+          );
+        }
+        break;
+
+      default:
+        break;
     }
 
     return messages.join("\n");
-  }, [lotStatus, watchQty]);
+  }, [lotStatus, watchQty, watchWorkType]);
 
   return (
     <div className="w-full p-4 grid md:grid-cols-11 gap-4">
@@ -292,10 +352,22 @@ const DyesDemandForm = () => {
               className="input"
             />
             <input
+              placeholder="Lot Number"
+              {...register("lot")}
+              className="input"
+            />
+            <input
+              placeholder="Party Name"
+              {...register("party")}
+              className="input"
+              readOnly
+            />
+            <input
               placeholder="Shift"
               {...register("shift")}
               className="input"
             />
+
             <input
               placeholder="Fabric Type"
               {...register("fabricType")}
@@ -347,20 +419,10 @@ const DyesDemandForm = () => {
               {...register("mainColor")}
               className="input"
             />
-            <input
-              placeholder="Party Name"
-              {...register("party")}
-              className="input"
-              readOnly
-            />
+
             <input
               placeholder="Master Name"
               {...register("master")}
-              className="input"
-            />
-            <input
-              placeholder="Lot Number"
-              {...register("lot")}
               className="input"
             />
           </div>
