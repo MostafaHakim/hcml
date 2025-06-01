@@ -229,7 +229,10 @@ const DyesDemandForm = () => {
   const getWarningMessage = useCallback(() => {
     const messages = [];
 
-    if (lotStatus.Dyeing + parseInt(watchQty) > lotStatus.initialQty) {
+    if (
+      watchWorkType === "Dyeing" &&
+      lotStatus.Dyeing + parseInt(watchQty) > lotStatus.initialQty
+    ) {
       messages.push(
         `এই লটে গ্রে ডাইং বাকি আছে ${
           lotStatus.initialQty - lotStatus.Dyeing
@@ -241,7 +244,10 @@ const DyesDemandForm = () => {
       );
     }
 
-    if (lotStatus.Printing > lotStatus.initialQty) {
+    if (
+      watchWorkType === "Printing" &&
+      lotStatus.Printing + parseInt(watchQty) > lotStatus.initialQty
+    ) {
       messages.push(
         `Printing demand exceeded! (${lotStatus.Printing.toFixed(
           2
@@ -249,7 +255,10 @@ const DyesDemandForm = () => {
       );
     }
 
-    if (lotStatus.Finishing > lotStatus.initialQty) {
+    if (
+      watchWorkType === "Finishing" &&
+      lotStatus.Finishing + parseInt(watchQty) > lotStatus.initialQty
+    ) {
       messages.push(
         `Finishing demand exceeded! (${lotStatus.Finishing.toFixed(
           2
