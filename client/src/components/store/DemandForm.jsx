@@ -231,9 +231,13 @@ const DyesDemandForm = () => {
 
     if (lotStatus.Dyeing + parseInt(watchQty) > lotStatus.initialQty) {
       messages.push(
-        `Dyeing demand exceeded! (${lotStatus.Dyeing.toFixed(
-          2
-        )} > ${lotStatus.initialQty.toFixed(2)})`
+        `এই লটে গ্রে ডাইং বাকি আছে ${
+          lotStatus.initialQty - lotStatus.Dyeing
+        } গজ এখন পর্যন্ত ডাইং হয়েছে  ${lotStatus.Dyeing.toFixed(2)} গজ`
+      );
+    } else {
+      messages.push(
+        `গ্রে ডাইং বাকি আছে ${lotStatus.initialQty - lotStatus.Dyeing} গজ`
       );
     }
 
@@ -254,7 +258,7 @@ const DyesDemandForm = () => {
     }
 
     return messages.join("\n");
-  }, [lotStatus,watchQty]);
+  }, [lotStatus, watchQty]);
 
   return (
     <div className="w-full p-4 grid md:grid-cols-11 gap-4">
@@ -469,9 +473,21 @@ const DyesDemandForm = () => {
             </ul>
 
             {lotStatus.initialQty > 0 && (
-              <div className="mt-4 p-2 bg-red-100 border border-red-300 rounded">
+              <div
+                className={`${
+                  lotStatus.initialQty - lotStatus.Dyeing < watchQty
+                    ? "bg-red-100 border border-red-300"
+                    : "bg-green-100 border border-green-300"
+                }mt-4 p-2 rounded`}
+              >
                 {getWarningMessage() && (
-                  <pre className="text-red-600 font-semibold whitespace-pre-wrap">
+                  <pre
+                    className={` font-semibold whitespace-pre-wrap ${
+                      lotStatus.initialQty - lotStatus.Dyeing < watchQty
+                        ? "text-red-600"
+                        : "text-green-600"
+                    }`}
+                  >
                     ⚠️ {getWarningMessage()}
                   </pre>
                 )}
