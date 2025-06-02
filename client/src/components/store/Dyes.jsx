@@ -9,7 +9,7 @@ function Dyes() {
   const [colorStock, setColorStock] = useState({});
 
   useEffect(() => {
-    fetch(`${BASE_URL}/stock`)
+    fetch(`https://hcml-ry8s.vercel.app/stock`)
       .then((res) => res.json())
       .then((data) => setColorStock(data))
       .catch((err) => console.error(err));
