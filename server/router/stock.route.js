@@ -6,7 +6,7 @@ const GAS_BASE_URL =
 
 router.get("/", async (req, res) => {
   try {
-    const response = await fetch(`${GAS_BASE_URL}?action=colorStock`);
+    const response = await fetch(`${GAS_BASE_URL}?action=colorstock`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
