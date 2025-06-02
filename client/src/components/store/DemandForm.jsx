@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const DyesDemandForm = () => {
   const [colorPrice, setColorPrice] = useState({});
@@ -10,7 +11,7 @@ const DyesDemandForm = () => {
   useEffect(() => {
     const getDemandData = async () => {
       try {
-        const res = await fetch("https://hcml-ry8s.vercel.app/demand");
+        const res = await fetch(`${BASE_URL}/demand`);
         const data = await res.json();
         setDemandData(data);
       } catch (error) {
@@ -23,7 +24,7 @@ const DyesDemandForm = () => {
   useEffect(() => {
     const getColorData = async () => {
       try {
-        const res = await fetch("https://hcml-ry8s.vercel.app/colorprice");
+        const res = await fetch(`${BASE_URL}/colorprice`);
         const data = await res.json();
         setColorPrice(data);
       } catch (error) {
@@ -70,7 +71,7 @@ const DyesDemandForm = () => {
   const watchWorkType = watch("workType");
 
   useEffect(() => {
-    fetch("https://hcml-ry8s.vercel.app/demand/verifydyes")
+    fetch(`${BASE_URL}/demand/verifydyes`)
       .then((res) => res.json())
       .then((data) => {
         setVerifyDyes(data);
@@ -133,7 +134,7 @@ const DyesDemandForm = () => {
       costPerGaj: costPerGaj.toFixed(2),
     };
 
-    fetch("https://hcml-ry8s.vercel.app/demand", {
+    fetch(`${BASE_URL}/demand`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: { "Content-Type": "application/json" },
@@ -225,45 +226,6 @@ const DyesDemandForm = () => {
 
     return true;
   };
-
-  // const getWarningMessage = useCallback(() => {
-  //   const messages = [];
-
-  //   if (
-  //     watchWorkType === "Dyeing" &&
-  //     lotStatus.Dyeing + parseInt(watchQty) > lotStatus.initialQty
-  //   ) {
-  //     messages.push(
-  //       `এই লটে গ্রে ডাইং বাকি আছে ${
-  //         lotStatus.initialQty - lotStatus.Dyeing
-  //       } গজ এখন পর্যন্ত ডাইং হয়েছে  ${lotStatus.Dyeing.toFixed(2)} গজ`
-  //     );
-  //   }
-
-  //   if (
-  //     watchWorkType === "Printing" &&
-  //     lotStatus.Printing + parseInt(watchQty) > lotStatus.initialQty
-  //   ) {
-  //     messages.push(
-  //       `Printing demand exceeded! (${lotStatus.Printing.toFixed(
-  //         2
-  //       )} > ${lotStatus.initialQty.toFixed(2)})`
-  //     );
-  //   }
-
-  //   if (
-  //     watchWorkType === "Finishing" &&
-  //     lotStatus.Finishing + parseInt(watchQty) > lotStatus.initialQty
-  //   ) {
-  //     messages.push(
-  //       `Finishing demand exceeded! (${lotStatus.Finishing.toFixed(
-  //         2
-  //       )} > ${lotStatus.initialQty.toFixed(2)})`
-  //     );
-  //   }
-
-  //   return messages.join("\n");
-  // }, [lotStatus, watchQty]);
 
   const getWarningMessage = useCallback(() => {
     const messages = [];
@@ -496,7 +458,11 @@ const DyesDemandForm = () => {
       </div>
 
       {/* Lot Status Panel */}
-      <div className="col-span-1 md:col-span-3 p-4 bg-white text-black rounded-lg">
+      <div
+        className={`col-span-1 md:col-span-3 p-4 bg-white text-black rounded-lg transition duration-700 ${
+          !watchLot ? "hidden m-20" : "static m-0"
+        }`}
+      >
         <div className="w-full flex flex-col items-center justify-center space-y-4">
           <h2 className="text-2xl font-serif px-8 py-2 bg-pink-800 rounded-full text-white">
             Lot Status
