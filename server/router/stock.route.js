@@ -18,4 +18,22 @@ router.get("/", async (req, res) => {
   }
 });
 
+// POST: Update stock when color is demanded
+router.post("/update", async (req, res) => {
+  try {
+    const payload = req.body;
+    const response = await fetch(`${GAS_BASE_URL}?action=updatecolorstock`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const result = await response.json();
+    res.json(result);
+  } catch (error) {
+    console.error("Error updating color stock:", error);
+    res.status(500).json({ error: "Failed to update color stock" });
+  }
+});
+
 module.exports = router;
