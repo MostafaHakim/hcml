@@ -8,7 +8,7 @@ function Topbar({ setTabOption }) {
         {tabOption.map((item, i) => {
           return (
             <NavLink
-              to={item}
+              to={item === "Home" ? "/" : item}
               className="px-1 md:px-8 py-2 hover:bg-white hover:bg-opacity-10 transition duration-300 text-xs md:text-md"
             >
               {item}

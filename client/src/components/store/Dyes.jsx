@@ -15,7 +15,6 @@ function Dyes() {
 
   return (
     <div className="w-full flex flex-col items-center justify-center px-8 pb-8">
-      <NavLink to="/">Home</NavLink>
       <Topbar setTabOption={griegeOption} />
       <main>
         <div className="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 w-full text-sm">
