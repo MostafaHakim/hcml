@@ -88,7 +88,7 @@ const DyesDemandForm = () => {
         setValue(`colors.${index}.price`, "");
       }
     });
-  }, [watchColors, colorPrice, setValue, stockColor]);
+  }, [watchColors, colorPrice, setValue]);
 
   useEffect(() => {
     if (watchLot && demandData.length > 0) {
