@@ -1,12 +1,18 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const DyesDemandForm = () => {
   const [colorPrice, setColorPrice] = useState({});
   const [demandData, setDemandData] = useState([]);
   const [verifyDyes, setVerifyDyes] = useState([]);
+  const [workOptions, setWorkOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [response, setResponse] = useState("");
+  const [stockColor, setStockColor] = useState("");
+  const [stockQty, setStockQty] = useState("");
 
   useEffect(() => {
     const getDemandData = async () => {
@@ -82,11 +88,12 @@ const DyesDemandForm = () => {
     watchColors.forEach((item, index) => {
       if (item?.colorName && colorPrice[item.colorName]) {
         setValue(`colors.${index}.price`, colorPrice[item.colorName]);
+        setStockColor([...stockColor, item.colorName]);
       } else {
         setValue(`colors.${index}.price`, "");
       }
     });
-  }, [watchColors, colorPrice, setValue]);
+  }, [watchColors, colorPrice, setValue, stockColor]);
 
   useEffect(() => {
     if (watchLot && demandData.length > 0) {
@@ -115,9 +122,19 @@ const DyesDemandForm = () => {
     }
   }, [watchLot, demandData, setValue]);
 
-  const [workOptions, setWorkOptions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState("");
+  const stockUpdate = async (qty) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/stock`, {
+        color: stockColor,
+        qty: parseInt(stockQty),
+      });
+
+      alert("✅ " + response.data);
+    } catch (error) {
+      console.error("❌ Submit failed:", error);
+      alert("Error submitting demand");
+    }
+  };
 
   const onSubmit = (data) => {
     setLoading(true);
@@ -133,7 +150,7 @@ const DyesDemandForm = () => {
       totalBatchCost: totalCost.toFixed(2),
       costPerGaj: costPerGaj.toFixed(2),
     };
-
+    stockUpdate(data.qty);
     fetch(`${BASE_URL}/demand`, {
       method: "POST",
       body: JSON.stringify(payload),
