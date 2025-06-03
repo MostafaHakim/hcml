@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
-import axios from "axios";
+
 const BASE_URL = "https://hcml-ry8s.vercel.app";
 
 const DyesDemandForm = () => {
@@ -12,7 +12,6 @@ const DyesDemandForm = () => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
   const [stockColor, setStockColor] = useState("");
-  const [stockQty, setStockQty] = useState("");
 
   useEffect(() => {
     const getDemandData = async () => {
@@ -124,15 +123,25 @@ const DyesDemandForm = () => {
 
   const stockUpdate = async (qty) => {
     try {
-      const response = await axios.post(`${BASE_URL}/stock`, {
-        color: stockColor,
-        qty: parseInt(stockQty),
+      const response = await fetch(`${BASE_URL}/stock`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          color: stockColor,
+          qty: parseInt(qty),
+        }),
       });
 
-      alert("✅ " + response.data);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(data); // response handle here
     } catch (error) {
-      console.error("❌ Submit failed:", error);
-      alert("Error submitting demand");
+      console.error("Error:", error);
     }
   };
 
