@@ -24,7 +24,7 @@ router.post("/", async (req, res) => {
   const { color, qty } = req.body;
 
   try {
-    const response = await fetch(`${GAS_BASE_URL}/action=stockCheck`, {
+    const response = await fetch(`${GAS_BASE_URL}?action=stockcheck`, {
       method: "POST",
       body: JSON.stringify({ color, qty }),
       headers: { "Content-Type": "application/json" },

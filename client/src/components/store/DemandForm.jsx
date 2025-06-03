@@ -2,8 +2,6 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 
-const BASE_URL = "https://hcml-ry8s.vercel.app";
-
 const DyesDemandForm = () => {
   const [colorPrice, setColorPrice] = useState({});
   const [demandData, setDemandData] = useState([]);
@@ -123,7 +121,7 @@ const DyesDemandForm = () => {
 
   const stockUpdate = async (qty) => {
     try {
-      const response = await fetch(`${BASE_URL}/stock`, {
+      const response = await fetch(`https://hcml-ry8s.vercel.app/stock`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -160,7 +158,7 @@ const DyesDemandForm = () => {
       costPerGaj: costPerGaj.toFixed(2),
     };
     stockUpdate(data.qty);
-    fetch(`${BASE_URL}/demand`, {
+    fetch(`https://hcml-ry8s.vercel.app/demand`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: { "Content-Type": "application/json" },
