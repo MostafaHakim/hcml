@@ -134,11 +134,6 @@ const DyesDemandForm = () => {
       costPerGaj: costPerGaj.toFixed(2),
     };
 
-    fetch(`${BASE_URL}/stock`, {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: { "Content-Type": "application/json" },
-    });
     fetch(`${BASE_URL}/demand`, {
       method: "POST",
       body: JSON.stringify(payload),
