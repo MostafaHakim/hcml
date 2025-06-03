@@ -25,7 +25,7 @@ function Dyes() {
   return (
     <div className="w-full flex flex-col items-center justify-center px-8 pb-8">
       <Topbar setTabOption={griegeOption} />
-      <main className="w-full">
+      <main className={` w-full`}>
         {loading && <p className="text-gray-500">Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
 

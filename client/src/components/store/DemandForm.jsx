@@ -84,6 +84,7 @@ const DyesDemandForm = () => {
     watchColors.forEach((item, index) => {
       if (item?.colorName && colorPrice[item.colorName]) {
         setValue(`colors.${index}.price`, colorPrice[item.colorName]);
+        setStockColor(item.colorName);
       } else {
         setValue(`colors.${index}.price`, "");
       }
