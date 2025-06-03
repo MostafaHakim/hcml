@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
 router.post("/update", async (req, res) => {
   try {
     const payload = req.body;
-    const response = await fetch(`${GAS_BASE_URL}?action=updatecolorstock`, {
+    const response = await fetch(`${GAS_BASE_URL}?action=colorstock`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: { "Content-Type": "application/json" },
