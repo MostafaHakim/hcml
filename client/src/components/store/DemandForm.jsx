@@ -9,7 +9,6 @@ const DyesDemandForm = () => {
   const [workOptions, setWorkOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
-  const [stockColor, setStockColor] = useState("");
 
   useEffect(() => {
     const getDemandData = async () => {
@@ -85,7 +84,6 @@ const DyesDemandForm = () => {
     watchColors.forEach((item, index) => {
       if (item?.colorName && colorPrice[item.colorName]) {
         setValue(`colors.${index}.price`, colorPrice[item.colorName]);
-        setStockColor([...stockColor, item.colorName]);
       } else {
         setValue(`colors.${index}.price`, "");
       }
@@ -119,30 +117,6 @@ const DyesDemandForm = () => {
     }
   }, [watchLot, demandData, setValue]);
 
-  const stockUpdate = async (qty) => {
-    try {
-      const response = await fetch(`https://hcml-ry8s.vercel.app/stock`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          color: stockColor,
-          qty: parseInt(qty),
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log(data); // response handle here
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
   const onSubmit = (data) => {
     setLoading(true);
 
@@ -157,7 +131,7 @@ const DyesDemandForm = () => {
       totalBatchCost: totalCost.toFixed(2),
       costPerGaj: costPerGaj.toFixed(2),
     };
-    stockUpdate(data.qty);
+
     fetch(`https://hcml-ry8s.vercel.app/demand`, {
       method: "POST",
       body: JSON.stringify(payload),

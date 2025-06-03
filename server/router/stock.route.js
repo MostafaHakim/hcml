@@ -19,23 +19,23 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST: Submit demand and update stock
-router.post("/", async (req, res) => {
-  const { color, qty } = req.body;
+// // POST: Submit demand and update stock
+// router.post("/", async (req, res) => {
+//   const { color, qty } = req.body;
 
-  try {
-    const response = await fetch(`${GAS_BASE_URL}?action=stockcheck`, {
-      method: "POST",
-      body: JSON.stringify({ color, qty }),
-      headers: { "Content-Type": "application/json" },
-    });
+//   try {
+//     const response = await fetch(`${GAS_BASE_URL}?action=stockcheck`, {
+//       method: "POST",
+//       body: JSON.stringify({ color, qty }),
+//       headers: { "Content-Type": "application/json" },
+//     });
 
-    const text = await response.text(); // Apps Script usually returns plain text
-    res.send(text);
-  } catch (error) {
-    console.error("Error updating stock:", error);
-    res.status(500).json({ error: "Failed to update stock" });
-  }
-});
+//     const text = await response.text(); // Apps Script usually returns plain text
+//     res.send(text);
+//   } catch (error) {
+//     console.error("Error updating stock:", error);
+//     res.status(500).json({ error: "Failed to update stock" });
+//   }
+// });
 
 module.exports = router;
