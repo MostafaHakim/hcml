@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Topbar from "../griege/Topbar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 function Dyes() {
   const griegeOption = ["demand", "purchase"];
@@ -25,6 +25,7 @@ function Dyes() {
   return (
     <div className="w-full flex flex-col items-center justify-center px-8 pb-8">
       <Topbar setTabOption={griegeOption} />
+
       <main className={` w-full`}>
         {loading && <p className="text-gray-500">Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
@@ -49,6 +50,7 @@ function Dyes() {
           ))}
         </div>
       </main>
+
       <Outlet />
     </div>
   );
