@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = "https://hcml-ry8s.vercel.app";
 
 const DyesDemandForm = () => {
   const [colorPrice, setColorPrice] = useState({});
@@ -17,7 +17,7 @@ const DyesDemandForm = () => {
   useEffect(() => {
     const getDemandData = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/demand`);
+        const res = await fetch(`https://hcml-ry8s.vercel.app/demand`);
         const data = await res.json();
         setDemandData(data);
       } catch (error) {
@@ -30,7 +30,7 @@ const DyesDemandForm = () => {
   useEffect(() => {
     const getColorData = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/colorprice`);
+        const res = await fetch(`https://hcml-ry8s.vercel.app/colorprice`);
         const data = await res.json();
         setColorPrice(data);
       } catch (error) {
@@ -77,7 +77,7 @@ const DyesDemandForm = () => {
   const watchWorkType = watch("workType");
 
   useEffect(() => {
-    fetch(`${BASE_URL}/demand/verifydyes`)
+    fetch(`https://hcml-ry8s.vercel.app/demand/verifydyes`)
       .then((res) => res.json())
       .then((data) => {
         setVerifyDyes(data);
