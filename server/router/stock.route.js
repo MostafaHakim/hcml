@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
 });
 
 // POST: Update stock when color is demanded
-router.post("/update", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const payload = req.body;
     const response = await fetch(`${GAS_BASE_URL}?action=colorstock`, {
