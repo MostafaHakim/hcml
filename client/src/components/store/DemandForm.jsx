@@ -7,6 +7,8 @@ const DyesDemandForm = () => {
   const [demandData, setDemandData] = useState([]);
   const [verifyDyes, setVerifyDyes] = useState([]);
   const [workOptions, setWorkOptions] = useState([]);
+  const [colors, setColors] = useState([{ colorName: "", gram: "" }]);
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
 
@@ -84,11 +86,11 @@ const DyesDemandForm = () => {
     watchColors.forEach((item, index) => {
       if (item?.colorName && colorPrice[item.colorName]) {
         setValue(`colors.${index}.price`, colorPrice[item.colorName]);
-        setStockColor(item.colorName);
       } else {
         setValue(`colors.${index}.price`, "");
       }
     });
+    setColors(watchColors);
   }, [watchColors, colorPrice, setValue]);
 
   useEffect(() => {
@@ -118,6 +120,29 @@ const DyesDemandForm = () => {
     }
   }, [watchLot, demandData, setValue]);
 
+  const stockUpdate = async () => {
+    setMessage("Submitting...");
+
+    try {
+      const response = await fetch("https://hcml-ry8s.vercel.app/stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ colors }),
+      });
+
+      const result = await response.json();
+
+      if (result.status === "success") {
+        setMessage("✅ স্টক থেকে কমে গেছে এবং অন হোল্ড এ গেছে!");
+        setColors([{ colorName: "", gram: "" }]); // reset form
+      } else {
+        setMessage("❌ সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+      }
+    } catch (error) {
+      setMessage("❌ কানেকশনের সমস্যা হয়েছে।");
+    }
+  };
+
   const onSubmit = (data) => {
     setLoading(true);
 
@@ -132,7 +157,7 @@ const DyesDemandForm = () => {
       totalBatchCost: totalCost.toFixed(2),
       costPerGaj: costPerGaj.toFixed(2),
     };
-
+    stockUpdate();
     fetch(`https://hcml-ry8s.vercel.app/demand`, {
       method: "POST",
       body: JSON.stringify(payload),
