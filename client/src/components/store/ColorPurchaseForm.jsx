@@ -45,7 +45,6 @@ const ColorPurchaseForm = () => {
 
   useEffect(() => {
     setStockColor([
-      ...stockColor,
       {
         // make sure it's an array of objects
         colorName: formData.colorName,
@@ -73,25 +72,22 @@ const ColorPurchaseForm = () => {
   };
   console.log(stockColor);
   const stockUpdate = async () => {
-    setMessage("Submitting...");
-
     try {
       const response = await fetch("https://hcml-ry8s.vercel.app/addstock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stockColor }),
+        body: JSON.stringify({ colors: stockColor }),
       });
 
       const result = await response.json();
-
       if (result.status === "success") {
-        setMessage("✅ স্টক থেকে কমে গেছে এবং অন হোল্ড এ গেছে!");
-        setStockColor([{ colorName: "", gram: "" }]); // reset stock
+        setMessage("✅ Stock updated successfully!");
+        setStockColor([{ colorName: "", gram: "" }]);
       } else {
-        setMessage("❌ সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+        setMessage("❌ Stock update failed. Please try again.");
       }
     } catch (error) {
-      setMessage("❌ কানেকশনের সমস্যা হয়েছে।");
+      setMessage("❌ Connection error during stock update.");
     }
   };
 
@@ -114,6 +110,10 @@ const ColorPurchaseForm = () => {
         stockUpdate();
       } else {
         setMessage("❌ Failed to submit");
+      }
+      if (result.success) {
+        await stockUpdate();
+        setMessage("✅ Purchase and stock update successful!");
       }
     } catch (error) {
       console.error("Submission error:", error);
