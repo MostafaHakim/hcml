@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 const ColorPurchaseForm = () => {
   const [colorMap, setColorMap] = useState({});
-  const [stockColor, setStockColor] = useState([{ colorName: "", gram: "" }]);
+  const [stockColor, setStockColor] = useState([]);
   const [vendorMap, setVendorMap] = useState([]);
   const [formData, setFormData] = useState({
     date: "",
@@ -45,6 +45,7 @@ const ColorPurchaseForm = () => {
 
   useEffect(() => {
     setStockColor([
+      ...stockColor,
       {
         // make sure it's an array of objects
         colorName: formData.colorName,
@@ -78,7 +79,7 @@ const ColorPurchaseForm = () => {
       const response = await fetch("https://hcml-ry8s.vercel.app/addstock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ colors: stockColor }),
+        body: JSON.stringify({ stockColor }),
       });
 
       const result = await response.json();
