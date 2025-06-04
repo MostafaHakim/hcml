@@ -41,7 +41,7 @@ app.use("/demand", demandRoute);
 app.use("/colorprice", colorPriceRoute);
 app.use("/griegein", griegeIn);
 app.use("/stock", stockRoute);
-app.use("/addstock");
+app.use("/addstock", addStock);
 
 // =====================Unknown URL =========================
 app.use((req, res, next) => {
