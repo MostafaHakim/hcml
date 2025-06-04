@@ -7,9 +7,7 @@ const GAS_BASE_URL =
 
 router.post("/", async (req, res) => {
   try {
-    const payload = {
-      colors: req.body.colors, // expects array of { colorName, gram }
-    };
+    const payload = req.body;
 
     const response = await fetch(`${GAS_BASE_URL}?action=addcolorstock`, {
       method: "POST",
