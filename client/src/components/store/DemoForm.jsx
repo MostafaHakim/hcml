@@ -7,18 +7,18 @@ function DemoForm() {
   const [message, setMessage] = useState("");
 
   // গুগল শিট থেকে প্রোডাক্ট লোড করা
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await fetch("https://hcml-ry8s.vercel.app/addstock");
-  //       const data = await response.json();
-  //       setProducts(data.slice(1)); // হেডার বাদ দিতে
-  //     } catch (error) {
-  //       console.error("ডেটা লোড করতে সমস্যা:", error);
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("https://hcml-ry8s.vercel.app/addstock");
+        const data = await response.json();
+        setProducts(data.slice(1)); // হেডার বাদ দিতে
+      } catch (error) {
+        console.error("ডেটা লোড করতে সমস্যা:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,10 +51,17 @@ function DemoForm() {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>প্রোডাক্ট নির্বাচন করুন:</label>
-          <select onChange={(e) => setSelectedProduct(e.target.value)} required>
+          <select
+            value={selectedProduct}
+            onChange={(e) => setSelectedProduct(e.target.value)}
+            required
+          >
             <option value="">-- প্রোডাক্ট নির্বাচন করুন --</option>
-            <option value="">ACETIC ACID</option>
-            <option value="">ACID</option>
+            {products.map((product, index) => (
+              <option key={index} value={product[0]}>
+                {product[0]} (বর্তমান: {product[1]})
+              </option>
+            ))}
           </select>
         </div>
 
