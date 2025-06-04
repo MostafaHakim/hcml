@@ -288,7 +288,6 @@ import React, { useState, useEffect } from "react";
 
 const ColorPurchaseForm = () => {
   const [colorMap, setColorMap] = useState({});
-  const [stockColor, setStockColor] = useState([{ colorName: "", gram: "" }]);
   const [vendorMap, setVendorMap] = useState([]);
   const [formData, setFormData] = useState({
     date: "",
@@ -329,15 +328,6 @@ const ColorPurchaseForm = () => {
     getVendorData();
   }, []);
 
-  useEffect(() => {
-    setStockColor([
-      {
-        colorName: formData.colorName,
-        gram: formData.qtyKg * 1000,
-      },
-    ]);
-  }, [formData.colorName, formData.qtyKg]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -353,30 +343,6 @@ const ColorPurchaseForm = () => {
         ...prev,
         [name]: value,
       }));
-    }
-  };
-
-  // FIXED: Updated to match GAS expected format
-  const stockUpdate = async () => {
-    setMessage("Updating stock...");
-
-    try {
-      const response = await fetch("https://hcml-ry8s.vercel.app/addstock", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ colors: stockColor }), // Key changed to 'colors'
-      });
-
-      const result = await response.json();
-
-      if (result.status === "success") {
-        setMessage("✅ Stock updated successfully!");
-        setStockColor([{ colorName: "", gram: "" }]); // reset stock
-      } else {
-        setMessage("❌ Stock update failed. Please try again.");
-      }
-    } catch (error) {
-      setMessage("❌ Connection error during stock update.");
     }
   };
 
@@ -397,7 +363,6 @@ const ColorPurchaseForm = () => {
       const result = await response.json();
       if (result.success) {
         setMessage("✅ Purchase submitted! Updating stock...");
-        await stockUpdate(); // Wait for stock update to complete
       } else {
         setMessage("❌ Failed to submit purchase");
       }
