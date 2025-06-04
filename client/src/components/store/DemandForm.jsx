@@ -124,7 +124,7 @@ const DyesDemandForm = () => {
     setMessage("Submitting...");
 
     try {
-      const response = await fetch("https://hcml-ry8s.vercel.app/stock/color", {
+      const response = await fetch("https://hcml-ry8s.vercel.app/stock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ colors }),
