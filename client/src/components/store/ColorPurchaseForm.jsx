@@ -75,14 +75,14 @@ const ColorPurchaseForm = () => {
       const response = await fetch("https://hcml-ry8s.vercel.app/addstock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stockColor }),
+        body: JSON.stringify({ colors: [stockColor] }), // ✅ Correct format
       });
 
       const result = await response.json();
 
       if (result.status === "success") {
         setMessage("✅ স্টক থেকে কমে গেছে এবং অন হোল্ড এ গেছে!");
-        setColors([{ colorName: "", gram: "" }]); // reset form
+        setStockColor([{ colorName: "", gram: "" }]); // reset stock
       } else {
         setMessage("❌ সমস্যা হয়েছে, আবার চেষ্টা করুন।");
       }
