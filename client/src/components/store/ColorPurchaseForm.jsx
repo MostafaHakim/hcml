@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 const ColorPurchaseForm = () => {
   const [colorMap, setColorMap] = useState({});
-  const [stockColor, setStockColor] = useState([]);
+  const [stockColor, setStockColor] = useState([{ colorName: "", gram: "" }]);
   const [vendorMap, setVendorMap] = useState([]);
   const [formData, setFormData] = useState({
     date: "",
