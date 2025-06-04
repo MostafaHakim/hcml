@@ -1,7 +1,80 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 function DemoForm() {
-  return <div>DemoForm</div>;
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState("");
+  const [newQty, setNewQty] = useState("");
+  const [message, setMessage] = useState("");
+
+  // গুগল শিট থেকে প্রোডাক্ট লোড করা
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await fetch("https://hcml-ry8s.vercel.app/addstock");
+  //       const data = await response.json();
+  //       setProducts(data.slice(1)); // হেডার বাদ দিতে
+  //     } catch (error) {
+  //       console.error("ডেটা লোড করতে সমস্যা:", error);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      product: selectedProduct,
+      newQty: newQty,
+    };
+
+    try {
+      const response = await fetch("https://hcml-ry8s.vercel.app/addstock", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.text();
+      setMessage(result);
+
+      // রিসেট ফর্ম
+      setNewQty("");
+    } catch (error) {
+      setMessage("এরর: " + error.message);
+    }
+  };
+
+  return (
+    <div className="container text-black">
+      <h1>প্রোডাক্ট কোয়ান্টিটি আপডেট</h1>
+
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>প্রোডাক্ট নির্বাচন করুন:</label>
+          <select onChange={(e) => setSelectedProduct(e.target.value)} required>
+            <option value="">-- প্রোডাক্ট নির্বাচন করুন --</option>
+            <option value="">ACETIC ACID</option>
+            <option value="">ACID</option>
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label>নতুন কোয়ান্টিটি:</label>
+          <input
+            type="number"
+            value={newQty}
+            onChange={(e) => setNewQty(e.target.value)}
+            required
+            min="0"
+          />
+        </div>
+
+        <button type="submit">আপডেট করুন</button>
+      </form>
+
+      {message && <div className="message">{message}</div>}
+    </div>
+  );
 }
 
 export default DemoForm;
