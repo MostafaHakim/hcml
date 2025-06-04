@@ -14,6 +14,7 @@ const demandRoute = require("./router/demand.route");
 const colorPriceRoute = require("./router/colorPrice.route");
 const griegeIn = require("./router/griegein.route");
 const stockRoute = require("./router/stock.route");
+const addStock = require("./router/add.stock.route");
 
 mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
@@ -40,6 +41,7 @@ app.use("/demand", demandRoute);
 app.use("/colorprice", colorPriceRoute);
 app.use("/griegein", griegeIn);
 app.use("/stock", stockRoute);
+app.use("/addstock");
 
 // =====================Unknown URL =========================
 app.use((req, res, next) => {

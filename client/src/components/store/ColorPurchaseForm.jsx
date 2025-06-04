@@ -72,7 +72,7 @@ const ColorPurchaseForm = () => {
     setMessage("Submitting...");
 
     try {
-      const response = await fetch("https://hcml-ry8s.vercel.app/stock", {
+      const response = await fetch("https://hcml-ry8s.vercel.app/addstock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ stockColor }),
