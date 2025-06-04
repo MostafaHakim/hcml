@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 const ColorPurchaseForm = () => {
   const [colorMap, setColorMap] = useState({});
-  const [stockColor, setStockColor] = useState([{ colorName: "", gram: "" }]);
+  const [stockColor, setStockColor] = useState({ colorName: "", gram: "" });
   const [vendorMap, setVendorMap] = useState([]);
   const [formData, setFormData] = useState({
     date: "",
@@ -45,7 +45,6 @@ const ColorPurchaseForm = () => {
 
   useEffect(() => {
     setStockColor([
-      ...stockColor,
       {
         // make sure it's an array of objects
         colorName: formData.colorName,
@@ -71,7 +70,7 @@ const ColorPurchaseForm = () => {
       }));
     }
   };
-
+  console.log(stockColor);
   const stockUpdate = async () => {
     setMessage("Submitting...");
 
