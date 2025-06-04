@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const fetch = require("node-fetch"); // Ensure this is installed
+// Ensure this is installed
 
 const GAS_BASE_URL =
   "https://script.google.com/macros/s/AKfycbzb0jNX8NpS27_BA7aWs2_whhQPgirwQ2sDvPq581Z9KpBLNR4tUAqfrwLc-herqSfT/exec";
