@@ -1,16 +1,16 @@
-// server/routes/colorStock.js
-
 const express = require("express");
 const router = express.Router();
+const fetch = require("node-fetch"); // Ensure this is installed
 
 const GAS_BASE_URL =
   "https://script.google.com/macros/s/AKfycbzb0jNX8NpS27_BA7aWs2_whhQPgirwQ2sDvPq581Z9KpBLNR4tUAqfrwLc-herqSfT/exec";
 
-// POST: Update stock when color is demanded
-
 router.post("/", async (req, res) => {
   try {
-    const payload = req.body;
+    const payload = {
+      colors: req.body.colors, // expects array of { colorName, gram }
+    };
+
     const response = await fetch(`${GAS_BASE_URL}?action=addcolorstock`, {
       method: "POST",
       body: JSON.stringify(payload),

@@ -44,10 +44,13 @@ const ColorPurchaseForm = () => {
   }, []);
 
   useEffect(() => {
-    setStockColor({
-      colorName: formData.colorName,
-      gram: formData.qtyKg * 1000,
-    });
+    setStockColor([
+      {
+        // make sure it's an array of objects
+        colorName: formData.colorName,
+        gram: formData.qtyKg * 1000,
+      },
+    ]);
   }, [formData.colorName, formData.qtyKg]);
 
   const handleChange = (e) => {
@@ -75,7 +78,7 @@ const ColorPurchaseForm = () => {
       const response = await fetch("https://hcml-ry8s.vercel.app/addstock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ colors: [stockColor] }), // ✅ Correct format
+        body: JSON.stringify({ colors: stockColor }),
       });
 
       const result = await response.json();
