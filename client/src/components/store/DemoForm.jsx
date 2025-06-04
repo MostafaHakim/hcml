@@ -12,7 +12,7 @@ function DemoForm() {
       try {
         const response = await fetch("https://hcml-ry8s.vercel.app/addstock");
         const data = await response.json();
-        setProducts(data.slice(1)); // হেডার বাদ দিতে
+        setProducts(data); // হেডার বাদ দিতে
       } catch (error) {
         console.error("ডেটা লোড করতে সমস্যা:", error);
       }
