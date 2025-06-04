@@ -19,7 +19,7 @@ router.get("/", async (req, res) => {
 });
 
 // POST: Update stock when color is demanded
-router.post("/", async (req, res) => {
+router.post("/color", async (req, res) => {
   try {
     const payload = req.body;
     const response = await fetch(`${GAS_BASE_URL}?action=updatecolorstock`, {
@@ -35,7 +35,7 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: "Failed to update color stock" });
   }
 });
-router.post("/addcolor", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const payload = req.body;
     const response = await fetch(`${GAS_BASE_URL}?action=addcolorstock`, {
