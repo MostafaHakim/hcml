@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 const ColorPurchaseForm = () => {
   const [colorMap, setColorMap] = useState({});
+  const [stockColor, setStockColor] = useState([{ colorName: "", gram: "" }]);
   const [vendorMap, setVendorMap] = useState([]);
   const [formData, setFormData] = useState({
     date: "",
@@ -42,6 +43,13 @@ const ColorPurchaseForm = () => {
     getVendorData();
   }, []);
 
+  useEffect(() => {
+    setStockColor({
+      colorName: formData.colorName,
+      gram: formData.qtyKg * 1000,
+    });
+  }, [formData.colorName, formData.qtyKg]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -57,6 +65,32 @@ const ColorPurchaseForm = () => {
         ...prev,
         [name]: value,
       }));
+    }
+  };
+
+  const stockUpdate = async () => {
+    setMessage("Submitting...");
+
+    try {
+      const response = await fetch(
+        "https://hcml-ry8s.vercel.app/stock/addcolor",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stockColor }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.status === "success") {
+        setMessage("✅ স্টক থেকে কমে গেছে এবং অন হোল্ড এ গেছে!");
+        setColors([{ colorName: "", gram: "" }]); // reset form
+      } else {
+        setMessage("❌ সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+      }
+    } catch (error) {
+      setMessage("❌ কানেকশনের সমস্যা হয়েছে।");
     }
   };
 
@@ -76,6 +110,7 @@ const ColorPurchaseForm = () => {
       const result = await response.json();
       if (result.success) {
         setMessage("✅ Purchase submitted!");
+        stockUpdate();
       } else {
         setMessage("❌ Failed to submit");
       }
