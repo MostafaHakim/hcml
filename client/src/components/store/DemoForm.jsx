@@ -14,7 +14,7 @@ function DemoForm() {
     e.preventDefault();
 
     try {
-      const response = await fetch(`https://hcml-ry8s.vercel.app/demand`, {
+      const response = await fetch(`https://hcml-ry8s.vercel.app/stock`, {
         method: "POST",
         body: JSON.stringify({ product, qty }),
         headers: {
