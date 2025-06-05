@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 function DemoForm() {
   const [color, setColor] = useState([]);
-  const [product, setProduct] = useState("");
+  const [colorName, setColorName] = useState("");
   const [qty, setQty] = useState("");
 
   useEffect(() => {
@@ -39,7 +39,7 @@ function DemoForm() {
       <select
         type="text"
         placeholder="Product Name"
-        onChange={(e) => setProduct(e.target.value)}
+        onChange={(e) => setColorName(e.target.value)}
         className="block w-full p-2 mb-2 border border-gray-300 rounded text-black"
         required
       >
