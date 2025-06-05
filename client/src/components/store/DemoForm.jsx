@@ -16,7 +16,7 @@ function DemoForm() {
     try {
       const response = await fetch(`https://hcml-ry8s.vercel.app/stock/add`, {
         method: "POST",
-        body: JSON.stringify({ product, qty }),
+        body: JSON.stringify({ colorName, qty }),
         headers: {
           "Content-Type": "application/json",
         },
