@@ -1,86 +1,70 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 function DemoForm() {
-  // const [products, setProducts] = useState([]);
-  // const [selectedProduct, setSelectedProduct] = useState("");
-  // const [newQty, setNewQty] = useState("");
-  // const [message, setMessage] = useState("");
+  const [color, setColor] = useState([]);
+  const [product, setProduct] = useState("");
+  const [qty, setQty] = useState("");
 
-  // // গুগল শিট থেকে প্রোডাক্ট লোড করা
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await fetch("https://hcml-ry8s.vercel.app/stock");
-  //       const data = await response.json();
-  //       setProducts(data); // হেডার বাদ দিতে
-  //     } catch (error) {
-  //       console.error("ডেটা লোড করতে সমস্যা:", error);
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    fetch("https://hcml-ry8s.vercel.app/stock")
+      .then((res) => res.json())
+      .then((data) => setColor(data));
+  }, []);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
+    try {
+      const response = await fetch(`https://hcml-ry8s.vercel.app/demand`, {
+        method: "POST",
+        body: JSON.stringify({ product, qty }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-  //   const payload = {
-  //     product: selectedProduct,
-  //     newQty: newQty,
-  //   };
-
-  //   try {
-  //     const response = await fetch("https://hcml-ry8s.vercel.app/addstock", {
-  //       method: "POST",
-  //       body: JSON.stringify(payload),
-  //     });
-
-  //     const result = await response.text();
-  //     setMessage(result);
-
-  //     // রিসেট ফর্ম
-  //     setNewQty("");
-  //   } catch (error) {
-  //     setMessage("এরর: " + error.message);
-  //   }
-  // };
+      const result = await response.text(); // Apps Script সাধারণত text output দেয়
+      alert(result);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      alert("Update failed!");
+    }
+  };
 
   return (
-    <div className="container text-black">
-      {/* <h1>প্রোডাক্ট কোয়ান্টিটি আপডেট</h1>
-
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>প্রোডাক্ট নির্বাচন করুন:</label>
-          <select
-            value={selectedProduct}
-            onChange={(e) => setSelectedProduct(e.target.value)}
-            required
-          >
-            <option value="">-- প্রোডাক্ট নির্বাচন করুন --</option>
-            {products.map((product, index) => (
-              <option key={index} value={product[0]}>
-                {product[0]} (বর্তমান: {product[1]})
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label>নতুন কোয়ান্টিটি:</label>
-          <input
-            type="number"
-            value={newQty}
-            onChange={(e) => setNewQty(e.target.value)}
-            required
-            min="0"
-          />
-        </div>
-
-        <button type="submit">আপডেট করুন</button>
-      </form>
-
-      {message && <div className="message">{message}</div>} */}
-    </div>
+    <form
+      onSubmit={handleSubmit}
+      className="p-4 bg-gray-100 rounded-md w-96 text-black"
+    >
+      <h2 className="text-lg font-bold mb-2">Update Product Quantity</h2>
+      <select
+        type="text"
+        placeholder="Product Name"
+        onChange={(e) => setProduct(e.target.value)}
+        className="block w-full p-2 mb-2 border border-gray-300 rounded text-black"
+        required
+      >
+        <option>--Select Color--</option>
+        {color.map((color) => {
+          return (
+            <option className="text-black">{color["PRODUCT NAME"]}</option>
+          );
+        })}
+      </select>
+      <input
+        type="number"
+        placeholder="Quantity"
+        value={qty}
+        onChange={(e) => setQty(e.target.value)}
+        className="block w-full p-2 mb-2 border border-gray-300 rounded"
+        required
+      />
+      <button
+        type="submit"
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Update
+      </button>
+    </form>
   );
 }
 
