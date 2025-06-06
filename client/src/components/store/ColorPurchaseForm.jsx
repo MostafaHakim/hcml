@@ -2,7 +2,6 @@
 
 // const ColorPurchaseForm = () => {
 //   const [colorMap, setColorMap] = useState({});
-//   const [stockColor, setStockColor] = useState([{ colorName: "", gram: "" }]);
 //   const [vendorMap, setVendorMap] = useState([]);
 //   const [formData, setFormData] = useState({
 //     date: "",
@@ -43,16 +42,6 @@
 //     getVendorData();
 //   }, []);
 
-//   useEffect(() => {
-//     setStockColor([
-//       {
-//         // make sure it's an array of objects
-//         colorName: formData.colorName,
-//         gram: formData.qtyKg * 1000,
-//       },
-//     ]);
-//   }, [formData.colorName, formData.qtyKg]);
-
 //   const handleChange = (e) => {
 //     const { name, value } = e.target;
 
@@ -70,30 +59,32 @@
 //       }));
 //     }
 //   };
-//   console.log(stockColor);
+
 //   const stockUpdate = async () => {
 //     try {
-//       const response = await fetch("https://hcml-ry8s.vercel.app/addstock", {
+//       const response = await fetch(`https://hcml-ry8s.vercel.app/stock/add`, {
 //         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ colors: stockColor }),
+//         body: JSON.stringify({
+//           colorName: formData.colorName,
+//           qty: formData.qtyKg,
+//         }),
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
 //       });
 
-//       const result = await response.json();
-//       if (result.status === "success") {
-//         setMessage("✅ Stock updated successfully!");
-//         setStockColor([{ colorName: "", gram: "" }]);
-//       } else {
-//         setMessage("❌ Stock update failed. Please try again.");
-//       }
+//       const result = await response.text(); // Apps Script সাধারণত text output দেয়
+//       alert(result);
 //     } catch (error) {
-//       setMessage("❌ Connection error during stock update.");
+//       console.error("Error updating product:", error);
+//       alert("Update failed!");
 //     }
 //   };
 
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
 //     setLoading(true);
+//     setMessage("Submitting purchase...");
 
 //     try {
 //       const response = await fetch("https://hcml-ry8s.vercel.app/proxy", {
@@ -106,34 +97,33 @@
 
 //       const result = await response.json();
 //       if (result.success) {
-//         setMessage("✅ Purchase submitted!");
+//         setMessage("✅ Purchase submitted! Updating stock...");
 //         stockUpdate();
 //       } else {
-//         setMessage("❌ Failed to submit");
-//       }
-//       if (result.success) {
-//         await stockUpdate();
-//         setMessage("✅ Purchase and stock update successful!");
+//         setMessage("❌ Failed to submit purchase");
 //       }
 //     } catch (error) {
 //       console.error("Submission error:", error);
 //       setMessage("❌ Submission failed. Try again.");
 //     }
 
-//     setTimeout(() => {
-//       setLoading(false);
-//       setMessage("");
-//     }, 4000);
+//     setLoading(false);
 
-//     setFormData({
-//       date: "",
-//       colorName: "",
-//       category: "",
-//       vendor: "",
-//       memo: "",
-//       qtyKg: "",
-//       pricePerKg: "",
-//     });
+//     // Reset form only after successful operations
+//     if (message.includes("success")) {
+//       setTimeout(() => {
+//         setFormData({
+//           date: "",
+//           colorName: "",
+//           category: "",
+//           vendor: "",
+//           memo: "",
+//           qtyKg: "",
+//           pricePerKg: "",
+//         });
+//         setMessage("");
+//       }, 3000);
+//     }
 //   };
 
 //   return (
@@ -180,8 +170,8 @@
 //           </div>
 //         </div>
 
-//         {/* Row 2: Category & Vendor */}
-//         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//         {/* Row 2: Category & Vendor... */}
+//         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 //           <div>
 //             <label className="block text-sm font-medium text-gray-600 mb-1">
 //               Category
@@ -201,20 +191,16 @@
 //               Vendor
 //             </label>
 //             <select
-//               type="text"
 //               name="vendor"
-//               list="vendorNameOption"
 //               value={formData.vendor}
 //               onChange={handleChange}
 //               className="w-full px-4 py-2 border rounded-xl"
 //             >
-//               {vendorMap.map((v, i) => {
-//                 return (
-//                   <option key={i} value={v}>
-//                     {v}
-//                   </option>
-//                 );
-//               })}
+//               {vendorMap.map((v, i) => (
+//                 <option key={i} value={v}>
+//                   {v}
+//                 </option>
+//               ))}
 //             </select>
 //           </div>
 //         </div>
@@ -273,7 +259,12 @@
 //         </button>
 
 //         {message && (
-//           <p className="text-center text-green-600 mt-4 font-semibold">
+//           <p
+//             className="text-center mt-4 font-semibold text-lg animate-pulse"
+//             style={
+//               message.includes("✅") ? { color: "green" } : { color: "red" }
+//             }
+//           >
 //             {message}
 //           </p>
 //         )}
@@ -288,7 +279,7 @@ import React, { useState, useEffect } from "react";
 
 const ColorPurchaseForm = () => {
   const [colorMap, setColorMap] = useState({});
-  const [vendorMap, setVendorMap] = useState([]);
+  const [vendorList, setVendorList] = useState([]);
   const [formData, setFormData] = useState({
     date: "",
     colorName: "",
@@ -302,41 +293,30 @@ const ColorPurchaseForm = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Fetch color map
   useEffect(() => {
-    const fetchColorMap = async () => {
-      try {
-        const res = await fetch("https://hcml-ry8s.vercel.app/color");
-        const data = await res.json();
-        setColorMap(data);
-      } catch (error) {
-        console.error("Failed to fetch colors:", error);
-      }
-    };
-    fetchColorMap();
+    fetch("https://hcml-ry8s.vercel.app/color")
+      .then((res) => res.json())
+      .then(setColorMap)
+      .catch((err) => console.error("Failed to fetch colors:", err));
   }, []);
 
+  // Fetch vendor list
   useEffect(() => {
-    const getVendorData = async () => {
-      try {
-        const res = await fetch("https://hcml-ry8s.vercel.app/vendor");
-        const data = await res.json();
-        setVendorMap(data);
-      } catch (error) {
-        console.error("Failed to fetch colors:", error);
-      }
-    };
-    getVendorData();
+    fetch("https://hcml-ry8s.vercel.app/vendor")
+      .then((res) => res.json())
+      .then(setVendorList)
+      .catch((err) => console.error("Failed to fetch vendors:", err));
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     if (name === "colorName") {
-      const category = colorMap[value] || "";
       setFormData((prev) => ({
         ...prev,
         colorName: value,
-        category: category,
+        category: colorMap[value] || "",
       }));
     } else {
       setFormData((prev) => ({
@@ -346,48 +326,62 @@ const ColorPurchaseForm = () => {
     }
   };
 
+  const updateStock = async () => {
+    try {
+      const res = await fetch("https://hcml-ry8s.vercel.app/stock/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          colorName: formData.colorName,
+          qty: formData.qtyKg * 1000,
+        }),
+      });
+      const result = await res.text();
+    } catch (err) {
+      console.error("Stock update failed:", err);
+      setMessage("Stock update failed!");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("Submitting purchase...");
 
     try {
-      const response = await fetch("https://hcml-ry8s.vercel.app/proxy", {
+      const res = await fetch("https://hcml-ry8s.vercel.app/proxy", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      const result = await response.json();
+      const result = await res.json();
+
       if (result.success) {
-        setMessage("✅ Purchase submitted! Updating stock...");
+        setMessage("Updating Stock...");
+        await updateStock();
+        setMessage("✅ Stock updated successfully...");
+        setTimeout(() => {
+          setFormData({
+            date: "",
+            colorName: "",
+            category: "",
+            vendor: "",
+            memo: "",
+            qtyKg: "",
+            pricePerKg: "",
+          });
+          setMessage("");
+        }, 3000);
       } else {
         setMessage("❌ Failed to submit purchase");
       }
-    } catch (error) {
-      console.error("Submission error:", error);
+    } catch (err) {
+      console.error("Submit error:", err);
       setMessage("❌ Submission failed. Try again.");
     }
 
     setLoading(false);
-
-    // Reset form only after successful operations
-    if (message.includes("success")) {
-      setTimeout(() => {
-        setFormData({
-          date: "",
-          colorName: "",
-          category: "",
-          vendor: "",
-          memo: "",
-          qtyKg: "",
-          pricePerKg: "",
-        });
-        setMessage("");
-      }, 3000);
-    }
   };
 
   return (
@@ -397,26 +391,18 @@ const ColorPurchaseForm = () => {
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6 text-black">
-        {/* Row 1: Date & Color Name */}
+        {/* Date & Color Name */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            label="Date"
+            type="date"
+            name="date"
+            value={formData.date}
+            onChange={handleChange}
+            required
+          />
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Date <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-xl"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Color Name <span className="text-red-500">*</span>
-            </label>
+            <FormLabel name="Color Name" required />
             <input
               type="text"
               name="colorName"
@@ -434,35 +420,28 @@ const ColorPurchaseForm = () => {
           </div>
         </div>
 
-        {/* Row 2: Category & Vendor... */}
+        {/* Category & Vendor */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            label="Category"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            readOnly
+            bgGray
+          />
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Category
-            </label>
-            <input
-              type="text"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              readOnly
-              className="w-full px-4 py-2 border rounded-xl bg-gray-100"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Vendor
-            </label>
+            <FormLabel name="Vendor" />
             <select
               name="vendor"
               value={formData.vendor}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-xl"
             >
-              {vendorMap.map((v, i) => (
-                <option key={i} value={v}>
-                  {v}
+              <option value="">Select Vendor</option>
+              {vendorList.map((vendor, index) => (
+                <option key={index} value={vendor}>
+                  {vendor}
                 </option>
               ))}
             </select>
@@ -470,54 +449,37 @@ const ColorPurchaseForm = () => {
         </div>
 
         {/* Memo */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Memo
-          </label>
-          <input
-            type="text"
-            name="memo"
-            value={formData.memo}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-xl"
-          />
-        </div>
+        <FormField
+          label="Memo"
+          name="memo"
+          value={formData.memo}
+          onChange={handleChange}
+        />
 
         {/* Quantity & Price */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Quantity (KG)
-            </label>
-            <input
-              type="number"
-              name="qtyKg"
-              value={formData.qtyKg}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-xl"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Price per KG
-            </label>
-            <input
-              type="number"
-              name="pricePerKg"
-              value={formData.pricePerKg}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-xl"
-            />
-          </div>
+          <FormField
+            label="Quantity (KG)"
+            type="number"
+            name="qtyKg"
+            value={formData.qtyKg}
+            onChange={handleChange}
+            required
+          />
+          <FormField
+            label="Price per KG"
+            type="number"
+            name="pricePerKg"
+            value={formData.pricePerKg}
+            onChange={handleChange}
+            required
+          />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 font-semibold"
           disabled={loading}
+          className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 font-semibold"
         >
           {loading ? "Submitting..." : "Submit"}
         </button>
@@ -525,9 +487,7 @@ const ColorPurchaseForm = () => {
         {message && (
           <p
             className="text-center mt-4 font-semibold text-lg animate-pulse"
-            style={
-              message.includes("✅") ? { color: "green" } : { color: "red" }
-            }
+            style={{ color: message.includes("✅") ? "green" : "red" }}
           >
             {message}
           </p>
@@ -536,5 +496,39 @@ const ColorPurchaseForm = () => {
     </div>
   );
 };
+
+// Reusable Form Field Component
+const FormField = ({
+  label,
+  type = "text",
+  name,
+  value,
+  onChange,
+  required = false,
+  readOnly = false,
+  bgGray = false,
+}) => (
+  <div>
+    <FormLabel name={label} required={required} />
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      required={required}
+      readOnly={readOnly}
+      className={`w-full px-4 py-2 border rounded-xl ${
+        bgGray ? "bg-gray-100" : ""
+      }`}
+    />
+  </div>
+);
+
+// Reusable Label Component
+const FormLabel = ({ name, required = false }) => (
+  <label className="block text-sm font-medium text-gray-600 mb-1">
+    {name} {required && <span className="text-red-500">*</span>}
+  </label>
+);
 
 export default ColorPurchaseForm;

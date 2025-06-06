@@ -9,13 +9,18 @@ import ColorPurchaseForm from "./components/store/ColorPurchaseForm";
 import DemandForm from "./components/store/DemandForm";
 import GriegeinForm from "./components/griege/GriegeinForm";
 import DemoForm from "./components/store/DemoForm";
+import GriegeReport from "./components/griege/report/GriegeReport";
+import Costing from "./components/griege/report/Costing";
 
 function App() {
   return (
     <>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />}>
+          <Route path="griege/received" element={<GriegeReport />} />
+          <Route path="dyes/demand" element={<Costing />} />
+        </Route>
         <Route path="/griege" element={<Griege />}>
           <Route path="griegein" element={<GriegeinForm />} />
         </Route>
