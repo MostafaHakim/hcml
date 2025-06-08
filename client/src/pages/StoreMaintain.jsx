@@ -196,7 +196,11 @@ function StoreMaintain() {
               {/* Mark Delivered Button */}
               <button
                 onClick={() => markDelivered(batch)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded"
+                className={`text-white px-4 py-1 rounded ${
+                  batch[0][18] === "Delivered"
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
               >
                 Mark as Delivered
               </button>

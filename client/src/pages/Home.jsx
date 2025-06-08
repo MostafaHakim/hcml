@@ -6,7 +6,7 @@ function Home() {
   const showLocation = location.pathname === "/home";
 
   return (
-    <div className="w-screen h-screen  flex flex-col items-start justify-center md:-mt-96">
+    <div className="w-screen h-screen  flex flex-col items-start justify-center ">
       {showLocation ? <Nav /> : <Outlet />}
     </div>
   );
