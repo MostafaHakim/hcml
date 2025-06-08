@@ -172,7 +172,7 @@ function StoreMaintain() {
                 <div>Lot No: {batch[0][12]}</div>
                 <div>Party: {batch[0][10]}</div>
                 <div>Memo No: {batch[0][1]}</div>
-                <div>Status: {batch[0][19] || "Pending"}</div>
+                <div>Status: {batch[0][18]}</div>
               </div>
 
               {/* Colors Table */}
