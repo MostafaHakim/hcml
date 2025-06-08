@@ -48,7 +48,7 @@ function Login() {
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-start mt-40">
       <form
-        className="w-1/3 bg-gradient-to-tl from-white to-sky-200 rounded-lg shadow-md"
+        className="w-3/4 md:w-2/3 lg:w-1/3 bg-gradient-to-tl from-white to-sky-200 rounded-lg shadow-md"
         onSubmit={handleSubmit}
       >
         <h2 className="text-xl font-sans font-semibold uppercase text-white py-2 rounded-t-lg bg-sky-600 text-center">
