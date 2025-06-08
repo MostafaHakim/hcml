@@ -11,26 +11,31 @@ import GriegeinForm from "./components/griege/GriegeinForm";
 import DemoForm from "./components/store/DemoForm";
 import GriegeReport from "./components/griege/report/GriegeReport";
 import Costing from "./components/griege/report/Costing";
+import Login from "./components/Login";
+import StoreMaintain from "./pages/StoreMaintain";
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />}>
-          <Route path="griege/received" element={<GriegeReport />} />
-          <Route path="dyes/demand" element={<Costing />} />
-        </Route>
-        <Route path="/griege" element={<Griege />}>
-          <Route path="griegein" element={<GriegeinForm />} />
-        </Route>
-        <Route path="/store" element={<Store />}>
-          <Route path="mechanical" element={<DemoForm />}></Route>
-          <Route path="dyes" element={<Dyes />}>
-            <Route path="demand" element={<DemandForm />} />
-            <Route path="purchase" element={<ColorPurchaseForm />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/home" element={<Home />}>
+          <Route path="dashboard" element={<Dashboard />}>
+            <Route path="griege/received" element={<GriegeReport />} />
+            <Route path="dyes/demand" element={<Costing />} />
+          </Route>
+          <Route path="griege" element={<Griege />}>
+            <Route path="griegein" element={<GriegeinForm />} />
+          </Route>
+          <Route path="store" element={<Store />}>
+            <Route path="mechanical" element={<DemoForm />}></Route>
+            <Route path="dyes" element={<Dyes />}>
+              <Route path="demand" element={<DemandForm />} />
+              <Route path="purchase" element={<ColorPurchaseForm />} />
+            </Route>
           </Route>
         </Route>
+        <Route path="/store" element={<StoreMaintain />} />
       </Routes>
     </>
   );

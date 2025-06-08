@@ -1,11 +1,9 @@
-import UserList from "../../context/UserLIst";
-
 function DemoForm() {
   return (
     <div>
       <h2>Demo</h2>
       <div>
-        <UserList />
+        <h2>Work</h2>
       </div>
     </div>
   );

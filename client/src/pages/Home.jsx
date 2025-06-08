@@ -1,11 +1,13 @@
+import { Outlet, useLocation } from "react-router-dom";
 import Nav from "../components/Nav";
 
 function Home() {
+  const location = useLocation();
+  const showLocation = location.pathname === "/home";
+
   return (
-    <div className="w-screen h-screen flex flex-col items-center justify-start pt-40">
-      <div className="w-full h-32 flex flex-col items-center justify-center">
-        <Nav />
-      </div>
+    <div className="w-screen h-screen  flex flex-col items-start justify-center md:-mt-96">
+      {showLocation ? <Nav /> : <Outlet />}
     </div>
   );
 }
