@@ -32,7 +32,7 @@ function UserList() {
       <ul className="list-disc pl-6">
         {users.map((row, index) => (
           <li key={index}>
-            {row.join(" | ")} {/* প্রতিটি row হলো [name, email, etc.] */}
+            {row["USER NAME"]} {/* প্রতিটি row হলো [name, email, etc.] */}
           </li>
         ))}
       </ul>
