@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
     res.json(data);
   } catch (error) {
     console.error("Error fetching colors:", error);
-    res.status(500).json({ error: "Failed to get color list" });
+    res.status(500).json({ error: "Failed to get user list" });
   }
 });
 
