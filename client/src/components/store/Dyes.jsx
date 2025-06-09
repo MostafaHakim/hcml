@@ -9,7 +9,7 @@ function Dyes() {
   const [error, setError] = useState(null);
 
   const location = useLocation();
-  const showLocation = location.pathname == "/store/dyes";
+  const showLocation = location.pathname == "/admin/store/dyes";
   useEffect(() => {
     fetch(`https://hcml-ry8s.vercel.app/stock`)
       .then((res) => res.json())
