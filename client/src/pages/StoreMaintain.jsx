@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Topbar from "../components/griege/Topbar";
+import Navbar from "../components/Navbar";
 
 function StoreMaintain() {
-  const griegeOption = ["Home", "griegein", "griegeout"];
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [memoSearch, setMemoSearch] = useState("");
@@ -126,7 +125,7 @@ function StoreMaintain() {
 
   return (
     <div className="w-screen h-screen">
-      <Topbar setTabOption={griegeOption} />
+      <Navbar />
       <div className="w-screen h-screen p-4 text-sm">
         {/* Filter Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

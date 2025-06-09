@@ -9,6 +9,15 @@ function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (isLoggedIn) {
+      const role = localStorage.getItem("role");
+      if (role === "Admin") navigate("/admin");
+      else if (role === "Storeman") navigate("/store");
+    }
+  }, []);
+
+  useEffect(() => {
     fetch("https://hcml-ry8s.vercel.app/user")
       .then((res) => res.json())
       .then((data) => setData(data))
@@ -21,25 +30,24 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Trim username for safer comparison
     const user = data.find(
       (item) =>
-        item["USER NAME"].toLowerCase() === username.trim().toLowerCase() &&
-        String(item["PASSWORD"]) === password
+        item["USER NAME"].toLowerCase().trim() ===
+          username.toLowerCase().trim() && String(item["PASSWORD"]) === password
     );
 
     if (user) {
-      console.log("Login successful:", user);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("username", user["USER NAME"]);
+      localStorage.setItem("role", user["ROLE"]);
+
       if (user["ROLE"] === "Admin") {
-        navigate("/home");
-      }
-
-      if (user["ROLE"] === "Storeman") {
+        navigate("/admin");
+      } else if (user["ROLE"] === "Storeman") {
         navigate("/store");
+      } else {
+        setMessage("Unauthorized role");
       }
-
-      // Optional: Save user info to localStorage or context
-      localStorage.setItem("user", JSON.stringify(user));
     } else {
       setMessage("Invalid username or password");
     }
