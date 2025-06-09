@@ -4,7 +4,7 @@ function Topbar({ setTabOption }) {
   const tabOption = [...setTabOption];
   return (
     <div className="w-full flex flex-row items-start justify-center py-1 px-4">
-      <ul className="flex flex-row uppercase  bg-black bg-opacity-30  rounded-full px-4 overflow-hidden divide-x-[1px] divide-slate-500">
+      <ul className="flex flex-row uppercase  bg-black bg-opacity-30  rounded-full px-4 overflow-hidden divide-x-[1px] divide-slate-500 text-white">
         {tabOption.map((item, i) => {
           return (
             <NavLink
