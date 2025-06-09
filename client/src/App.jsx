@@ -87,6 +87,7 @@ import DemoForm from "./components/store/DemoForm";
 // Auth wrapper
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./components/NotFound";
+import DeliveredDyes from "./components/DeliveredDyes";
 
 function App() {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -129,6 +130,7 @@ function App() {
       {/* Storeman routes */}
       <Route element={<ProtectedRoute allowedRoles={["Storeman"]} />}>
         <Route path="/store" element={<StoreMaintain />} />
+        <Route path="/delivered" element={<DeliveredDyes />} />
       </Route>
 
       {/* Not found fallback route */}

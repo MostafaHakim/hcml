@@ -51,4 +51,38 @@ router.post("/add", async (req, res) => {
     res.status(500).json({ error: "Failed to update color stock" });
   }
 });
+
+router.post("/hold", async (req, res) => {
+  try {
+    const { batchData } = req.body;
+    if (
+      !Array.isArray(batchData) ||
+      !batchData.every(
+        (item) =>
+          typeof item.color === "string" && typeof item.gram === "number"
+      )
+    ) {
+      return res.status(400).json({ error: "Invalid batchData format" });
+    }
+
+    const response = await fetch(`${GAS_BASE_URL}?action=holdcolor`, {
+      method: "POST",
+      body: JSON.stringify(req.body),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const result = await response.json();
+    if (!result.success) {
+      return res
+        .status(400)
+        .json({ error: result.message || "Failed to update color stock" });
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error("Error updating color stock:", error);
+    res.status(500).json({ error: "Failed to update color stock" });
+  }
+});
+
 module.exports = router;

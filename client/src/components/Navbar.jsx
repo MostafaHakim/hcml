@@ -22,8 +22,8 @@ function Navbar() {
         <Link to="/" className="py-2 px-4 text-sm font-semibold">
           Home
         </Link>
-        <Link to="/dashboard" className="py-2 px-4 text-sm font-semibold">
-          Dashboard
+        <Link to="/delivered" className="py-2 px-4 text-sm font-semibold">
+          Delivered
         </Link>
         <Link to="/store" className="py-2 px-4 text-sm font-semibold">
           Store
