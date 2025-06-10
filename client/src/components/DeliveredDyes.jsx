@@ -6,15 +6,24 @@ function DeliveredDyes() {
   const [filteredData, setFilteredData] = useState([]);
   const [memoSearch, setMemoSearch] = useState("");
   const [dateSearch, setDateSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     fetch(`https://hcml-ry8s.vercel.app/demand/verifydyes`)
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch data");
+        return res.json();
+      })
+      .then((data) => setData(data))
+      .catch((error) => {
+        console.error("Fetch error:", error);
+        alert("Failed to load data. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
-
   // নতুন useEffect যোগ করুন:
   useEffect(() => {
     if (data.length > 0) {
@@ -156,59 +165,67 @@ function DeliveredDyes() {
             </button>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          {/* Display Table */}
-          {batchRows.map((batch, batchIndex) => {
-            if (batch[0][18] === "Delivered") {
-              return (
-                <div
-                  key={batchIndex}
-                  className="border rounded-lg mb-8 shadow p-3 bg-white col-span-1"
-                >
-                  {/* Header Info */}
-                  <div className="mb-3 text-sm font-medium">
-                    <div>Memo No: {batch[0][1]}</div>
-                    <div>Date: {formatDate(batch[0][0])}</div>
-                    <div>Lot No: {batch[0][12]}</div>
-                    <div>Party: {batch[0][10]}</div>
-                    <div>Status: {batch[0][18]}</div>
-                  </div>
-
-                  {/* Colors Table */}
-                  <table className="min-w-full text-left mb-3 border">
-                    <thead className="bg-gray-200">
-                      <tr>
-                        <th className="border px-2 py-1">Color</th>
-                        <th className="border px-2 py-1">Gram</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {batch.map((row, idx) => (
-                        <tr key={idx} className="hover:bg-gray-50">
-                          <td className="border px-2 py-1">{row[6]}</td>
-                          <td className="border px-2 py-1">{row[13]}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-
-                  {/* Mark Delivered Button */}
-                  <button
-                    onClick={() => markDelivered(batch)}
-                    className={`text-white px-4 py-1 rounded ${
-                      batch[0][18] === "Delivered"
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-green-600 hover:bg-green-700"
-                    }`}
+        {loading ? (
+          <div className="text-center text-white mt-8 text-2xl">
+            Loading batches...
+          </div>
+        ) : batchRows.length === 0 ? (
+          <div className="text-center text-gray-500 mt-8">
+            No matching batches found.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            {batchRows.map((batch, batchIndex) => {
+              if (batch[0][18] === "Delivered") {
+                return (
+                  <div
+                    key={batchIndex}
+                    className="border rounded-lg mb-8 shadow p-3 bg-white col-span-1"
                   >
-                    Mark as Delivered
-                  </button>
-                </div>
-              );
-            }
-          })}
-        </div>
+                    {/* Header Info */}
+                    <div className="mb-3 text-sm font-medium">
+                      <div>Memo No: {batch[0][1]}</div>
+                      <div>Date: {formatDate(batch[0][0])}</div>
+                      <div>Lot No: {batch[0][12]}</div>
+                      <div>Party: {batch[0][10]}</div>
+                      <div>Status: {batch[0][18]}</div>
+                    </div>
+
+                    {/* Colors Table */}
+                    <table className="min-w-full text-left mb-3 border">
+                      <thead className="bg-gray-200">
+                        <tr>
+                          <th className="border px-2 py-1">Color</th>
+                          <th className="border px-2 py-1">Gram</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {batch.map((row, idx) => (
+                          <tr key={idx} className="hover:bg-gray-50">
+                            <td className="border px-2 py-1">{row[6]}</td>
+                            <td className="border px-2 py-1">{row[13]}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+
+                    {/* Mark Delivered Button */}
+                    <button
+                      onClick={() => markDelivered(batch)}
+                      className={`text-white px-4 py-1 rounded ${
+                        batch[0][18] === "Delivered"
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-green-600 hover:bg-green-700"
+                      }`}
+                    >
+                      Mark as Delivered
+                    </button>
+                  </div>
+                );
+              }
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

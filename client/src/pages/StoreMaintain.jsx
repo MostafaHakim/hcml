@@ -6,8 +6,10 @@ function StoreMaintain() {
   const [filteredData, setFilteredData] = useState([]);
   const [memoSearch, setMemoSearch] = useState("");
   const [dateSearch, setDateSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     fetch(`https://hcml-ry8s.vercel.app/demand/verifydyes`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch data");
@@ -17,17 +19,11 @@ function StoreMaintain() {
       .catch((error) => {
         console.error("Fetch error:", error);
         alert("Failed to load data. Please try again.");
+      })
+      .finally(() => {
+        setLoading(false);
       });
-  }, [data]);
-
-  useEffect(() => {
-    filterByDateAndMemo(data);
-  }, [memoSearch, dateSearch, data]);
-
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return isNaN(date) ? dateStr : date.toISOString().split("T")[0];
-  };
+  }, []);
 
   const filterByDateAndMemo = (fullData) => {
     if (!fullData?.length) {
@@ -168,9 +164,12 @@ function StoreMaintain() {
             </button>
           </div>
         </div>
-
-        {batchRows.length === 0 ? (
-          <div className="text-center text-gray-500">
+        {loading ? (
+          <div className="text-center text-white mt-8 text-2xl">
+            Loading batches...
+          </div>
+        ) : batchRows.length === 0 ? (
+          <div className="text-center text-white mt-8 text-2xl">
             No matching batches found.
           </div>
         ) : (
