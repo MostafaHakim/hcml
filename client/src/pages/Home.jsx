@@ -1,6 +1,7 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Nav from "../components/Nav";
 import { useEffect } from "react";
+import PageWrapper from "../components/ui/PageWrapper";
 
 function Home() {
   const location = useLocation();
@@ -17,16 +18,19 @@ function Home() {
   }, []);
 
   return (
-    <div className="w-screen h-screen  flex flex-col items-center justify-between p-8">
-      <div className="w-full flex flex-row items-center justify-end space-x-2">
-        <h2 className="text-lg font-sans font-bold">{username}</h2>
-        <h3 className="text-xs text-white bg-rose-500 px-2 py-[2px] rounded-full ring-1 ring-stone-400 ring-inset">
-          {role}
-        </h3>
+    <PageWrapper>
+      <div className="w-screen h-screen  flex flex-col items-center justify-between p-8">
+        <div className="w-full flex flex-row items-center justify-end space-x-2">
+          <h2 className="text-lg font-sans font-bold">{username}</h2>
+          <h3 className="text-xs text-white bg-rose-500 px-2 py-[2px] rounded-full ring-1 ring-stone-400 ring-inset">
+            {role}
+          </h3>
+        </div>
+
+        {showLocation ? <Nav /> : <Outlet />}
+        <div></div>
       </div>
-      {showLocation ? <Nav /> : <Outlet />}
-      <div></div>
-    </div>
+    </PageWrapper>
   );
 }
 

@@ -13,7 +13,9 @@ function GriegeReport() {
 
   return (
     <div className="w-full p-4">
-      <h2>Report Griege</h2>
+      <h2 className="uppercase py-1 bg-green-800 bg-opacity-50 text-white rounded-t-lg">
+        Report Griege
+      </h2>
       <div className="grid grid-cols-8 bg-blue-900 text-white text-sm">
         <div className="col-span-1">Date</div>
         <div className="col-span-1">Lot Number</div>
