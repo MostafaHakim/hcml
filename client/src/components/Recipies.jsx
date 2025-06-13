@@ -1,119 +1,195 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 
-function Recipies({ searchColor, weight }) {
-  const [rawData, setRawData] = useState([]);
+function groupByBatch(rows) {
+  if (!rows || rows.length === 0) return [];
 
-  useEffect(() => {
-    fetch("https://hcml-ry8s.vercel.app/demand/recipies")
-      .then((res) => res.json())
-      .then((data) => setRawData(data));
-  }, []);
+  const batches = [];
+  let currentBatch = null;
 
-  const headers = rawData[0];
-  const dataRows = rawData.slice(1);
+  rows.forEach((row) => {
+    const isNewBatchRow = row[0] !== "" && row[0] != null;
 
-  function groupByBatch(rows) {
-    const batches = [];
-    let currentBatch = [];
-
-    rows.forEach((row) => {
-      if (row[0] !== "") {
-        if (currentBatch.length) {
-          batches.push(currentBatch);
-        }
-        currentBatch = [row]; // নতুন ব্যাচ শুরু
-      } else {
-        currentBatch.push(row); // আগের ব্যাচে যুক্ত করো
+    if (isNewBatchRow) {
+      if (currentBatch) {
+        batches.push(currentBatch);
       }
-    });
 
-    if (currentBatch.length) {
-      batches.push(currentBatch);
+      currentBatch = [row];
+    } else {
+      if (currentBatch) {
+        currentBatch.push(row);
+      }
     }
+  });
 
-    return batches;
+  if (currentBatch) {
+    batches.push(currentBatch);
   }
 
-  const [batches, setBatches] = useState([]);
+  return batches;
+}
+
+function Recipes({ searchColor, weight }) {
+  const [rawData, setRawData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const grouped = groupByBatch(dataRows);
-    setBatches(grouped);
+    setLoading(true);
+    fetch("https://hcml-ry8s.vercel.app/demand/recipies")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(
+            "Network response was not ok. Please try again later."
+          );
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setRawData(data);
+        setError(null);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch recipes:", err);
+        setError("Failed to load recipe data.");
+        setRawData([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
-  const filteredBatches = batches.filter((batch) => {
-    const mainColor = batch[0][1]?.toLowerCase();
-    return mainColor.includes(searchColor.toLowerCase());
-  });
-  console.log(rawData);
-  return (
-    <div className="p-4 max-w-5xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">Dyeing Batches</h2>
+  const headers = useMemo(
+    () => (rawData.length > 0 ? rawData[0] : []),
+    [rawData]
+  );
+  const dataRows = useMemo(
+    () => (rawData.length > 1 ? rawData.slice(1) : []),
+    [rawData]
+  );
 
+  const batches = useMemo(() => groupByBatch(dataRows), [dataRows]);
+
+  const filteredBatches = useMemo(() => {
+    if (!searchColor) {
+      return batches;
+    }
+    return batches.filter((batch) => {
+      if (batch.length > 0 && batch[0][1]) {
+        const mainColor = batch[0][1].toLowerCase();
+        return mainColor.includes(searchColor.toLowerCase());
+      }
+      return false;
+    });
+  }, [batches, searchColor]);
+
+  if (loading) {
+    return (
+      <div className="text-center p-8 text-gray-500">Loading recipes...</div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center p-8 text-red-600 bg-red-100 rounded-lg">
+        {error}
+      </div>
+    );
+  }
+
+  if (rawData.length === 0) {
+    return (
+      <div className="text-center p-8 text-gray-500">
+        No recipe data available.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
       {filteredBatches.length === 0 ? (
-        <p className="text-gray-500">No batch found for "{searchColor}"</p>
+        <p className="text-center p-8 text-gray-500 bg-white rounded-lg shadow">
+          {searchColor
+            ? `No batch found for "${searchColor}"`
+            : "No batches available."}
+        </p>
       ) : (
         filteredBatches.map((batch, index) => (
-          <div key={index} className="mb-8 border rounded shadow">
-            <h3 className="bg-blue-100 px-4 py-2 font-semibold">
-              Batch {index + 1} — Main Color: {batch[0][1]}
+          <div
+            key={index}
+            className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden"
+          >
+            <h3 className="bg-gray-100 px-4 py-3 font-bold text-gray-800 border-b border-gray-200">
+              Batch #{index + 1} &mdash; Main Color:{" "}
+              <span className="text-blue-600">{batch[0][1]}</span>
             </h3>
-            <table className="w-full text-sm text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-200">
-                  {headers.map((header, idx) => (
-                    <th key={idx} className="border px-2 py-1">
-                      {header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {batch.map((row, i) => {
-                  const isMainRow = row[0] !== "";
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50">
+                  <tr>
+                    {headers.map((header, idx) => (
+                      <th
+                        key={idx}
+                        className="px-4 py-2 text-gray-600 font-semibold uppercase tracking-wider"
+                      >
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {batch.map((row, i) => {
+                    const isMainRow = i === 0;
 
-                  // *** MODIFICATION START ***
-                  // Use the 'weight' prop if it's a valid number, otherwise use the original batch[0][0]
-                  const greigeWeightForCalculation =
-                    parseFloat(weight) || parseFloat(batch[0][0]);
-                  // *** MODIFICATION END ***
+                    const greigeWeightForCalculation =
+                      parseFloat(weight) || parseFloat(batch[0][0]) || 0;
 
-                  return (
-                    <tr
-                      key={i}
-                      className={isMainRow ? "bg-blue-50 font-semibold" : ""}
-                    >
-                      {row.map((cell, j) => {
-                        let displayValue = cell;
-
-                        if (j === 0) {
-                          // Display the user-provided weight if it's the main row, otherwise '-'
-                          displayValue = isMainRow ? weight || "-" : "-";
-                        } else if (j === 4) {
-                          const percent = parseFloat(row[3]);
-                          if (!isNaN(percent)) {
-                            // Use greigeWeightForCalculation for all rows in the batch
-                            displayValue = (
-                              greigeWeightForCalculation * percent
-                            ).toFixed(2);
-                          } else {
-                            displayValue = row[4] !== "" ? row[4] : "-";
-                          }
-                        } else if (cell === "") {
-                          displayValue = "-";
+                    return (
+                      <tr
+                        key={i}
+                        className={
+                          isMainRow ? "bg-blue-50" : "hover:bg-gray-50"
                         }
+                      >
+                        {headers.map((header, j) => {
+                          let displayValue = row[j];
 
-                        return (
-                          <td key={j} className="border px-2 py-1">
-                            {displayValue}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                          if (j === 0) {
+                            displayValue = isMainRow
+                              ? weight || batch[0][0]
+                              : "—";
+                          } else if (j === 4) {
+                            const percent = parseFloat(row[3]);
+                            if (!isNaN(percent)) {
+                              displayValue = (
+                                greigeWeightForCalculation * percent
+                              ).toFixed(3);
+                            } else {
+                              displayValue = row[4] !== "" ? row[4] : "—";
+                            }
+                          }
+
+                          if (displayValue === "" || displayValue === null) {
+                            displayValue = "—";
+                          }
+
+                          return (
+                            <td
+                              key={j}
+                              className={`px-4 py-2 ${
+                                isMainRow && "font-semibold"
+                              }`}
+                            >
+                              {displayValue}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         ))
       )}
@@ -121,4 +197,4 @@ function Recipies({ searchColor, weight }) {
   );
 }
 
-export default Recipies;
+export default Recipes;
