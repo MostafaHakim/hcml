@@ -45,7 +45,7 @@ function Recipies({ searchColor, weight }) {
     const mainColor = batch[0][1]?.toLowerCase();
     return mainColor.includes(searchColor.toLowerCase());
   });
-
+  console.log(rawData);
   return (
     <div className="p-4 max-w-5xl mx-auto">
       <h2 className="text-xl font-bold mb-4">Dyeing Batches</h2>
