@@ -1,9 +1,9 @@
-import Navbar from "../Navbar";
+import Recipies from "../Recipies";
 
 function DemoForm() {
   return (
     <div className="w-screen">
-      <h2>Demo</h2>
+      <Recipies />
     </div>
   );
 }

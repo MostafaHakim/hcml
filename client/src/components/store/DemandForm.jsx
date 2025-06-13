@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
+import Recipies from "../Recipies";
 
 const DyesDemandForm = () => {
   const [colorPrice, setColorPrice] = useState({});
@@ -62,6 +63,7 @@ const DyesDemandForm = () => {
       master: "",
       lot: "",
       status: "pending",
+      weight: "", // <--- Add 'weight' here
     },
   });
 
@@ -74,6 +76,8 @@ const DyesDemandForm = () => {
   const watchLot = watch("lot");
   const watchQty = watch("qty");
   const watchWorkType = watch("workType");
+  const mainColor = watch("mainColor");
+  const watchWeight = watch("weight"); // <--- Watch the new 'weight' field
 
   useEffect(() => {
     fetch(`https://hcml-ry8s.vercel.app/demand/verifydyes`)
@@ -152,10 +156,10 @@ const DyesDemandForm = () => {
         setMessage("✅ স্টক থেকে কমে গেছে এবং অন হোল্ড এ গেছে!");
         setColors([{ colorName: "", gram: "" }]);
       } else {
-        setMessage("❌ সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+        setMessage("❌ সমস্যা হয়েছে, আবার চেষ্টা করুন।");
       }
     } catch (error) {
-      setMessage("❌ কানেকশনের সমস্যা হয়েছে।");
+      setMessage("❌ কানেকশনের সমস্যা হয়েছে।");
     }
   };
 
@@ -279,7 +283,13 @@ const DyesDemandForm = () => {
 
   return (
     <div className="w-full p-4 grid md:grid-cols-11 gap-4">
-      <div className="col-span-1 md:col-span-3"></div>
+      <div className="col-span-1 md:col-span-3">
+        {mainColor && watchWeight ? (
+          <Recipies searchColor={mainColor} weight={watchWeight} />
+        ) : (
+          ""
+        )}
+      </div>
       <div className="w-full col-span-1 md:col-span-5 mx-auto p-4 text-black relative bg-white rounded-lg shadow-md">
         {loading && (
           <div className="absolute inset-0 bg-white bg-opacity-40 flex items-center justify-center z-10">
@@ -368,6 +378,11 @@ const DyesDemandForm = () => {
               className="input"
             />
 
+            <input
+              placeholder="Weight"
+              {...register("weight")}
+              className="input"
+            />
             <input
               placeholder="Master Name"
               {...register("master")}
