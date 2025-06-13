@@ -1,50 +1,39 @@
 import React, { useEffect, useState } from "react";
 
-const rawData = [
-  [
-    "GRIEGE WEIGHT (KG)",
-    "MAIN COLOR",
-    "REQUIRED COLOR",
-    "PERCENT COLOR FOR PER KG GRIEGE",
-    "TOTAL COLOR REQUIRED",
-  ],
-  [1000, "NAVY BLUE", "NAVY BLUE EXNF 300%", 0.1, 100],
-  ["", "", "RUBINE BLUE", 0.25, 250],
-  ["", "", "BLACK ECT 300%", 0.15, 150],
-  ["", "", "LEVELING DLA", "", 1000],
-  ["", "", "ACETIC ACID", "", 1000],
-  [2000, "BLACK", "RUBINE BLUE", 0.4, 800],
-  ["", "", "BLACK ECT 300%", 0.5, 1000],
-  ["", "", "LEVELING DLA", "", 1000],
-  ["", "", "ACETIC ACID", "", 1000],
-];
+function Recipies({ searchColor, weight }) {
+  const [rawData, setRawData] = useState([]);
 
-const headers = rawData[0];
-const dataRows = rawData.slice(1);
+  useEffect(() => {
+    fetch("https://hcml-ry8s.vercel.app/demand/recipies")
+      .then((res) => res.json())
+      .then((data) => setRawData(data));
+  }, []);
 
-function groupByBatch(rows) {
-  const batches = [];
-  let currentBatch = [];
+  const headers = rawData[0];
+  const dataRows = rawData.slice(1);
 
-  rows.forEach((row) => {
-    if (row[0] !== "") {
-      if (currentBatch.length) {
-        batches.push(currentBatch);
+  function groupByBatch(rows) {
+    const batches = [];
+    let currentBatch = [];
+
+    rows.forEach((row) => {
+      if (row[0] !== "") {
+        if (currentBatch.length) {
+          batches.push(currentBatch);
+        }
+        currentBatch = [row]; // নতুন ব্যাচ শুরু
+      } else {
+        currentBatch.push(row); // আগের ব্যাচে যুক্ত করো
       }
-      currentBatch = [row]; // নতুন ব্যাচ শুরু
-    } else {
-      currentBatch.push(row); // আগের ব্যাচে যুক্ত করো
-    }
-  });
+    });
 
-  if (currentBatch.length) {
-    batches.push(currentBatch);
+    if (currentBatch.length) {
+      batches.push(currentBatch);
+    }
+
+    return batches;
   }
 
-  return batches;
-}
-
-function Recipies({ searchColor, weight }) {
   const [batches, setBatches] = useState([]);
 
   useEffect(() => {
