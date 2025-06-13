@@ -3,7 +3,7 @@ import Recipies from "../Recipies";
 function DemoForm() {
   return (
     <div className="w-screen">
-      <Recipies />
+      <h2></h2>
     </div>
   );
 }
