@@ -7,6 +7,7 @@ function Costing() {
   const [toDate, setToDate] = useState("");
   const [lotSearch, setLotSearch] = useState("");
   const [partySearch, setPartySearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`https://hcml-ry8s.vercel.app/demand/verifydyes`)
@@ -14,6 +15,7 @@ function Costing() {
       .then((data) => {
         setData(data);
         setFilteredData(data);
+        setLoading(false);
       });
   }, []);
 
@@ -68,6 +70,56 @@ function Costing() {
     setFilteredData([headers, ...filtered]);
   };
 
+  const renderSkeletonTable = () => {
+    const columnCount = 12;
+    const fakeBatchCount = 3;
+    const fakeRowsPerBatch = 4;
+
+    return (
+      <div className="min-w-full border border-gray-300 rounded-lg shadow mx-auto max-w-7xl animate-pulse">
+        <table className="min-w-full text-left">
+          <thead className="bg-blue-100">
+            <tr>
+              {Array.from({ length: columnCount }).map((_, index) => (
+                <th key={index} className="py-2 px-3 border text-center">
+                  <div className="h-4 bg-slate-300 rounded w-24 mx-auto"></div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: fakeBatchCount }).map((_, batchIndex) => (
+              <React.Fragment key={batchIndex}>
+                {Array.from({ length: fakeRowsPerBatch }).map((_, rowIndex) => (
+                  <tr
+                    key={rowIndex}
+                    className={`${
+                      rowIndex === 0 ? "bg-yellow-100" : "bg-white"
+                    } hover:bg-yellow-50`}
+                  >
+                    {Array.from({ length: columnCount }).map((_, cellIndex) => (
+                      <td
+                        key={cellIndex}
+                        className="border px-3 py-2 text-center"
+                      >
+                        <div
+                          className={`h-4 ${
+                            rowIndex === 0 ? "bg-slate-400" : "bg-slate-200"
+                          } rounded w-full`}
+                        ></div>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  if (loading) return renderSkeletonTable();
   if (!filteredData || filteredData.length === 0)
     return <p className="text-center mt-4">No data available</p>;
 
@@ -76,7 +128,6 @@ function Costing() {
 
   const batchRows = [];
   let currentBatch = [];
-
   const dateIndex = headers.indexOf("Date");
 
   rows.forEach((row) => {
