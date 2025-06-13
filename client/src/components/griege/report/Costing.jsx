@@ -29,12 +29,15 @@ function Costing() {
     const headers = data[0];
     const rows = data.slice(1);
 
-    // প্রথমে ব্যাচে ভাগ করো
+    const dateIndex = headers.indexOf("Date");
+    const lotIndex = headers.indexOf("Lot No");
+    const partyIndex = headers.indexOf("Party");
+
     const batches = [];
     let currentBatch = [];
 
     rows.forEach((row) => {
-      const isNewBatch = row[0] !== "";
+      const isNewBatch = row[dateIndex] !== "";
       if (isNewBatch && currentBatch.length > 0) {
         batches.push(currentBatch);
         currentBatch = [];
@@ -43,16 +46,17 @@ function Costing() {
     });
     if (currentBatch.length > 0) batches.push(currentBatch);
 
-    // এখন ব্যাচের প্রথম রো অনুযায়ী ফিল্টার করো
     const filteredBatches = batches.filter((batch) => {
       const firstRow = batch[0];
-      const rowDate = formatDate(firstRow[0]);
-      const lotNo = firstRow[12] || "";
-      const partyName = firstRow[10] || "";
+      const rowDate = formatDate(firstRow[dateIndex]);
+      const lotNo = firstRow[lotIndex]?.toString() || "";
+      const partyName = firstRow[partyIndex]?.toString() || "";
 
       const inDateRange =
         (!fromDate || rowDate >= fromDate) && (!toDate || rowDate <= toDate);
-      const lotMatch = lotSearch === "" || lotNo.includes(lotSearch);
+      const lotMatch =
+        lotSearch === "" ||
+        lotNo.toLowerCase().includes(lotSearch.toLowerCase());
       const partyMatch =
         partySearch === "" ||
         partyName.toLowerCase().includes(partySearch.toLowerCase());
@@ -60,9 +64,7 @@ function Costing() {
       return inDateRange && lotMatch && partyMatch;
     });
 
-    // ফিল্টার করা ব্যাচগুলো আবার একসাথে করে রিটার্ন
     const filtered = filteredBatches.flat();
-
     setFilteredData([headers, ...filtered]);
   };
 
@@ -75,18 +77,17 @@ function Costing() {
   const batchRows = [];
   let currentBatch = [];
 
+  const dateIndex = headers.indexOf("Date");
+
   rows.forEach((row) => {
-    const isNewBatch = row[0] !== ""; // যদি Date কলামে কিছু থাকে, মানে নতুন ব্যাচ শুরু
+    const isNewBatch = row[dateIndex] !== "";
     if (isNewBatch && currentBatch.length > 0) {
       batchRows.push(currentBatch);
       currentBatch = [];
     }
     currentBatch.push(row);
   });
-
-  if (currentBatch.length > 0) {
-    batchRows.push(currentBatch);
-  }
+  if (currentBatch.length > 0) batchRows.push(currentBatch);
 
   return (
     <div className="overflow-x-auto p-4 text-sm">
@@ -170,7 +171,7 @@ function Costing() {
                       {row.map((cell, cellIndex) => (
                         <td
                           key={cellIndex}
-                          className={`border px-3 py-1 whitespace-nowrap ${
+                          className={`border px-3 py-1 whitespace-nowrap text-center ${
                             headers[cellIndex] === "Date"
                               ? "text-blue-700 font-medium"
                               : ""

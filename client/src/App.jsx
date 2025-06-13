@@ -22,6 +22,7 @@ import DemoForm from "./components/store/DemoForm";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./components/NotFound";
 import DeliveredDyes from "./components/DeliveredDyes";
+import ColorPurchase from "./components/ColorPurchase";
 
 function App() {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -47,6 +48,7 @@ function App() {
             <Route path="dashboard" element={<Dashboard />}>
               <Route path="griege/received" element={<GriegeReport />} />
               <Route path="dyes/demand" element={<Costing />} />
+              <Route path="dyes/purchase" element={<ColorPurchase />} />
             </Route>
 
             <Route path="griege" element={<Griege />}>
