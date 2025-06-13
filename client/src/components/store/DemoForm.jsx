@@ -1,7 +1,9 @@
+import ColorPurchase from "../ColorPurchase";
+
 function DemoForm() {
   return (
     <div className="w-screen">
-      <h2></h2>
+      <ColorPurchase />
     </div>
   );
 }
