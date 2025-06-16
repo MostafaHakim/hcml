@@ -40,13 +40,7 @@ function Delivery() {
   };
 
   const handleThanSelection = (lotNo, thanData) => {
-    setSelectedThans((prev) => {
-      // ডুপ্লিকেট চেক করুন
-      const exists = prev.some(
-        (item) => item.lotNo === lotNo && item.thanNo === thanData.thanNo
-      );
-      return exists ? prev : [...prev, { lotNo, ...thanData }];
-    });
+    setSelectedThans((prev) => [...prev, { lotNo, ...thanData }]);
   };
 
   return (
