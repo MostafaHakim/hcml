@@ -501,16 +501,18 @@ export default function LotEntryForm() {
 
       <div>
         <label className="block font-semibold mb-1">কার্যাবলী (Actions)</label>
-        <div className="flex flex-wrap gap-4">
+        <div className="grid grid-cols-4 gap-4">
           {processOptions.map((option) => (
-            <label key={option} className="flex items-center space-x-2">
+            <label key={option} className="flex flex-row space-x-1">
               <input
+                className="w-4"
                 type="checkbox"
                 value={option}
                 checked={form.action.includes(option)}
                 onChange={handleCheckboxChange}
               />
-              <span>{option}</span>
+
+              <span className="text-sm font-normal">{option}</span>
             </label>
           ))}
         </div>
