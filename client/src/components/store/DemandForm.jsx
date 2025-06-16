@@ -120,11 +120,6 @@ const DyesDemandForm = () => {
             workTypes = workValue;
           }
 
-          // Filter valid work types
-          workTypes = workTypes.filter((w) =>
-            ["Dyeing", "Printing", "Finishing"].includes(w)
-          );
-
           setWorkOptions(workTypes);
 
           if (workTypes.length > 0) {
@@ -539,5 +534,3 @@ const DyesDemandForm = () => {
 };
 
 export default DyesDemandForm;
-
-
