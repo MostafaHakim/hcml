@@ -59,7 +59,7 @@ function LotThanSelector({ lot, onThanSelect, apiBase }) {
         setLoading(true);
         setError(null);
         const res = await fetch(
-          `${apiBase}/getThansByLot?lot=${encodeURIComponent(lot.lotNo)}`
+          `${apiBase}/griegein/getThansByLot?lot=${lot.lotNo}`
         );
 
         if (!res.ok) throw new Error("Failed to fetch data");

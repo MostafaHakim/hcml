@@ -92,7 +92,11 @@ const API_BASE = "https://hcml-ry8s.vercel.app"; // সংজ্ঞায়ি�
 
 function Delivery() {
   const [party, setParty] = useState("");
-  const [parties, setParties] = useState(["Party A", "Party B", "Party C"]);
+  const [parties, setParties] = useState([
+    "আমিন ব্রাদার্স(Amin Brothers)",
+    "Party B",
+    "Party C",
+  ]);
   const [lots, setLots] = useState([]);
   const [selectedThans, setSelectedThans] = useState([]);
 
@@ -106,9 +110,7 @@ function Delivery() {
 
     try {
       const res = await fetch(
-        `${API_BASE}/griegein/getLotsByParty?party=${encodeURIComponent(
-          selectedParty
-        )}`
+        `${API_BASE}/griegein/getLotsByParty?party=${selectedParty}`
       );
       const data = await res.json();
       if (data.lots) setLots(data.lots);
