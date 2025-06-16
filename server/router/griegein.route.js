@@ -63,7 +63,9 @@ router.get("/getThansByLot", async (req, res) => {
     }
 
     const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getThansByLot&lot=${lot}`
+      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getThansByLot&lot=${encodeURIComponent(
+        lot
+      )}`
     );
 
     if (!response.ok) {

@@ -65,6 +65,7 @@ function LotThanSelector({ lot, onThanSelect, apiBase }) {
         if (!res.ok) throw new Error("Failed to fetch data");
 
         const data = await res.json();
+        console.log(data);
         setThans(data.thans || []);
       } catch (err) {
         console.error("Error loading thans:", err);

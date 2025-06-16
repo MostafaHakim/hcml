@@ -20,7 +20,7 @@ function Delivery() {
   }, []);
   const handlePartyChange = async (e) => {
     const selectedParty = e.target.value;
-    console.log("Selected Party:", selectedParty);
+
     setParty(selectedParty);
     setLots([]);
     setSelectedThans([]);
@@ -32,7 +32,7 @@ function Delivery() {
         `${API_BASE}/griegein/getLotsByParty?party=${selectedParty}`
       );
       const data = await res.json();
-      console.log("Fetched Lots:", data);
+
       if (data.lots) setLots(data.lots);
     } catch (err) {
       console.error("Failed to fetch lots:", err);
