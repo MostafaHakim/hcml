@@ -41,10 +41,10 @@ router.get("/delivarythan", async (req, res) => {
 });
 router.get("/getLotsByParty", async (req, res) => {
   try {
-    const { selectedParty } = req.query;
+    const { party } = req.query;
     const response = await fetch(
       `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getLotsByParty&party=${encodeURIComponent(
-        selectedParty
+        party
       )}`
     );
     const data = await response.json();

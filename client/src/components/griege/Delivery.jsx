@@ -29,9 +29,7 @@ function Delivery() {
 
     try {
       const res = await fetch(
-        `${API_BASE}/griegein/getLotsByParty?party=${encodeURIComponent(
-          selectedParty
-        )}`
+        `${API_BASE}/griegein/getLotsByParty?party=${selectedParty}`
       );
       const data = await res.json();
       console.log("Fetched Lots:", data);
