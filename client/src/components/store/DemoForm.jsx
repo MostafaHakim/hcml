@@ -1,5 +1,11 @@
+import Delivery from "../griege/Delivery";
+
 function DemoForm() {
-  return <h2>Hello</h2>;
+  return (
+    <>
+      <Delivery />
+    </>
+  );
 }
 
 export default DemoForm;
