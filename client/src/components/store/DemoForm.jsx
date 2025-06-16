@@ -1,7 +1,7 @@
 import Lot from "../Lot";
 
 function DemoForm() {
-  return <Lot />;
+  return <h2>Demo</h2>;
 }
 
 export default DemoForm;

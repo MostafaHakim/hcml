@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 
 function GriegeReport() {
   const [demand, setDemand] = useState([]);
-  const [than, setThan] = useState([]);
 
   useEffect(() => {
     fetch(`https://hcml-ry8s.vercel.app/demand`)
@@ -11,13 +10,7 @@ function GriegeReport() {
       .then((data) => {
         setDemand(data);
       });
-    fetch(`https://hcml-ry8s.vercel.app/griegein/than`)
-      .then((res) => res.json())
-      .then((data) => {
-        setThan(data);
-      });
   }, []);
-  console.log(than);
   return (
     <div className="w-full p-4">
       <h2 className="uppercase py-1 bg-green-800 bg-opacity-50 text-white rounded-t-lg">
