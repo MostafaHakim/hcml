@@ -23,6 +23,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./components/NotFound";
 import DeliveredDyes from "./components/DeliveredDyes";
 import ColorPurchase from "./components/ColorPurchase";
+import Lot from "./components/Lot";
 
 function App() {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -47,6 +48,7 @@ function App() {
           <Route path="/admin" element={<Home />}>
             <Route path="dashboard" element={<Dashboard />}>
               <Route path="griege/received" element={<GriegeReport />} />
+              <Route path="griege/received/:lotnumber" element={<Lot />} />
               <Route path="dyes/demand" element={<Costing />} />
               <Route path="dyes/purchase" element={<ColorPurchase />} />
             </Route>

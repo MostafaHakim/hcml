@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 function GriegeReport() {
   const [demand, setDemand] = useState([]);
+  const [than, setThan] = useState([]);
 
   useEffect(() => {
     fetch(`https://hcml-ry8s.vercel.app/demand`)
@@ -9,8 +11,13 @@ function GriegeReport() {
       .then((data) => {
         setDemand(data);
       });
+    fetch(`https://hcml-ry8s.vercel.app/griegein/than`)
+      .then((res) => res.json())
+      .then((data) => {
+        setThan(data);
+      });
   }, []);
-
+  console.log(than);
   return (
     <div className="w-full p-4">
       <h2 className="uppercase py-1 bg-green-800 bg-opacity-50 text-white rounded-t-lg">
@@ -27,8 +34,9 @@ function GriegeReport() {
       </div>
       {demand.map((item, i) => {
         return (
-          <div
-            className={`grid grid-cols-8 text-black text-sm ${
+          <Link
+            to={`${item["Lot Number"]}`}
+            className={`grid grid-cols-8 text-black text-sm hover:bg-gray-500 hover:text-white ${
               i % 2 ? "bg-gray-300" : "bg-white"
             }`}
           >
@@ -41,7 +49,7 @@ function GriegeReport() {
             <div className="col-span-1">{item["Received Grey"]}</div>
             <div className="col-span-1">{item["Type"]}</div>
             <div className="col-span-1">{item["Design"]}</div>
-          </div>
+          </Link>
         );
       })}
     </div>

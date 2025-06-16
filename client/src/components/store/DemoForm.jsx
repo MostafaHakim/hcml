@@ -1,7 +1,7 @@
-import ColorPurchase from "../ColorPurchase";
+import Lot from "../Lot";
 
 function DemoForm() {
-  return <div className="w-screen"></div>;
+  return <Lot />;
 }
 
 export default DemoForm;

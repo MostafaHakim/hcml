@@ -14,6 +14,19 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/than", async (req, res) => {
+  try {
+    const response = await fetch(
+      "https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getthan"
+    );
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching colors:", error);
+    res.status(500).json({ error: "Failed to get lot list" });
+  }
+});
+
 router.post("/", async (req, res) => {
   try {
     const response = await fetch(
