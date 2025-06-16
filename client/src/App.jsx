@@ -24,6 +24,7 @@ import NotFound from "./components/NotFound";
 import DeliveredDyes from "./components/DeliveredDyes";
 import ColorPurchase from "./components/ColorPurchase";
 import Lot from "./components/Lot";
+import DeliveryForm from "./components/griege/DeliveryForm";
 
 function App() {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -55,6 +56,7 @@ function App() {
 
             <Route path="griege" element={<Griege />}>
               <Route path="griegein" element={<GriegeinForm />} />
+              <Route path="griegeout" element={<DeliveryForm />} />
             </Route>
 
             <Route path="store" element={<Store />}>

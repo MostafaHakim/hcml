@@ -1,8 +1,5 @@
-import DeliveryForm from "../griege/DeliveryForm";
-import Lot from "../Lot";
-
 function DemoForm() {
-  return <DeliveryForm />;
+  return <h2>Hello</h2>;
 }
 
 export default DemoForm;
