@@ -6,6 +6,11 @@ export default function DeliveryForm() {
   const [finishingValues, setFinishingValues] = useState({});
 
   const fetchData = () => {
+    if (!lot) {
+      alert("Please enter a Lot Number");
+      return;
+    }
+
     fetch(`https://hcml-ry8s.vercel.app/griegein/delivarythan?lot=${lot}`)
       .then((res) => res.json())
       .then((data) => {
@@ -13,6 +18,10 @@ export default function DeliveryForm() {
         const initialValues = {};
         data.forEach((item) => (initialValues[item.row] = ""));
         setFinishingValues(initialValues);
+      })
+      .catch((err) => {
+        console.error("Error fetching delivery data:", err);
+        alert("Failed to load data");
       });
   };
 
