@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 export default function LotEntryForm() {
   const [partyListOptions, setPartyListOptions] = useState([]);
+  const [allData, setAllData] = useState([]);
   const [thans, setThans] = useState([]);
   const [form, setForm] = useState({
     lotNo: "",
@@ -34,8 +35,11 @@ export default function LotEntryForm() {
       }
     };
     getNextLotNo();
+    fetch("https://hcml-ry8s.vercel.app/party/alldata")
+      .then((res) => res.json())
+      .then((data) => setAllData);
   }, []);
-
+  console.log(allData);
   useEffect(() => {
     const getAllParty = async () => {
       try {
