@@ -363,9 +363,9 @@ function Delivery() {
 
   // Load Party Names initially
   useEffect(() => {
-    fetch(`${baseUrl}/party?action=getParties`)
+    fetch(`${baseUrl}/party`)
       .then((res) => res.json())
-      .then((data) => setParties(data.parties));
+      .then((data) => setParties(data));
   }, []);
 
   const handlePartyChange = async (party) => {
@@ -374,9 +374,9 @@ function Delivery() {
       `${baseUrl}/getlots?party=${encodeURIComponent(party)}`
     );
     const lotData = await lotRes.json();
-
+    console.log(lotData);
     const tableList = await Promise.all(
-      lotData.lots.map(async (lot) => {
+      lotData.map(async (lot) => {
         const lotInfoRes = await fetch(
           `${baseUrl}/getlotinfo?lot=${encodeURIComponent(lot)}`
         );
@@ -386,7 +386,7 @@ function Delivery() {
           `${baseUrl}/colorres?lot=${encodeURIComponent(lot)}`
         );
         const colors = await colorRes.json();
-
+        console.log(lotInfo);
         return {
           lot,
           type: lotInfo.info.type,
@@ -397,6 +397,7 @@ function Delivery() {
         };
       })
     );
+
     setTables(tableList);
   };
 
@@ -408,9 +409,9 @@ function Delivery() {
     const detailData = await detailRes.json();
 
     const validRows = detailData.rows.filter(
-      (row) => row.finishing === "" && row.status !== "Delivered"
+      (row) => row.finishing !== "" && row.status !== "Delivered"
     );
-
+    console.log(detailData);
     const newTables = [...tables];
     newTables[tableIndex].color = color;
     newTables[tableIndex].rows = validRows;
@@ -423,7 +424,6 @@ function Delivery() {
         await fetch(`${baseUrl}/griegeupdate`, {
           method: "POST",
           body: JSON.stringify({
-            action: "markDelivered",
             lot: table.lot,
             color: table.color,
           }),
