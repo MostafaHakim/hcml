@@ -39,49 +39,6 @@ router.get("/delivarythan", async (req, res) => {
     res.status(500).json({ error: "Failed to get delivery than list" });
   }
 });
-router.get("/getLotsByParty", async (req, res) => {
-  try {
-    const { party } = req.query;
-    const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getLotsByParty&party=${encodeURIComponent(
-        party
-      )}`
-    );
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error("Error fetching delivery than:", error);
-    res.status(500).json({ error: "Failed to get delivery than list" });
-  }
-});
-router.get("/getThansByLot", async (req, res) => {
-  try {
-    const { lot } = req.query; // শুধু 'lot' প্যারামিটার আসবে, 'lot.lotNo' নয়
-
-    if (!lot) {
-      return res.status(400).json({ error: "Lot number is required" });
-    }
-
-    const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getThansByLot&lot=${encodeURIComponent(
-        lot
-      )}`
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch from Google Script");
-    }
-
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error("Error fetching delivery than:", error);
-    res.status(500).json({
-      error: "Failed to get delivery than list",
-      details: error.message,
-    });
-  }
-});
 
 router.post("/", async (req, res) => {
   try {
