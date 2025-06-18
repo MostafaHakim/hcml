@@ -293,6 +293,7 @@ function Delivery() {
   const [parties, setParties] = useState([]);
   const [selectedParty, setSelectedParty] = useState("");
   const [partyAddress, setPartyAddress] = useState("");
+  const [address, setAddress] = useState("");
   const [lots, setLots] = useState([]);
   const [tables, setTables] = useState([]);
   const [deliveryDate, setDeliveryDate] = useState(() => {
@@ -326,23 +327,30 @@ function Delivery() {
       });
   }, []);
 
+  useEffect(() => {
+    if (selectedParty) {
+      fetch(`${baseUrl}/getaddress?party=${encodeURIComponent(selectedParty)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setAddress(data.address || "");
+        })
+        .catch((err) => {
+          console.error("Address fetch error:", err);
+          setAddress("");
+        });
+    }
+  }, [selectedParty]);
+
   const handlePartyChange = async (party) => {
     setSelectedParty(party);
     setTables([]);
-    setPartyAddress("");
     try {
       const lotRes = await fetch(
         `${baseUrl}/getlots?party=${encodeURIComponent(party)}`
       );
-      const addressRes = await fetch(
-        `${baseUrl}/getpartyaddress?party=${encodeURIComponent(party)}`
-      );
-      const [lotData, addressData] = await Promise.all([
-        lotRes.json(),
-        addressRes.json(),
-      ]);
+
+      const lotData = await Promise.all([lotRes.json()]);
       setLots(lotData);
-      setPartyAddress(addressData.address || "");
     } catch (error) {
       console.error("Error fetching lots or address:", error);
       alert("Failed to load lots/address.");
@@ -515,16 +523,16 @@ function Delivery() {
             </select>
           </div>
 
-          {partyAddress && (
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <label className="font-semibold text-gray-700 col-span-1">
-                Address:
-              </label>
-              <div className="col-span-2 border border-gray-200 bg-gray-100 px-3 py-2 rounded">
-                {partyAddress}
-              </div>
-            </div>
-          )}
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <label className="font-semibold text-gray-700 col-span-1">
+              Address:
+            </label>
+            <input
+              className="col-span-2 border border-gray-300 rounded px-3 py-2 bg-gray-100"
+              value={address}
+              readOnly
+            />
+          </div>
 
           {selectedParty && (
             <button
