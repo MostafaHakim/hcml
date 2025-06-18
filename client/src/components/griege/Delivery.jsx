@@ -328,17 +328,21 @@ function Delivery() {
   }, []);
 
   useEffect(() => {
-    if (selectedParty) {
-      fetch(`${baseUrl}/getaddress?party=${encodeURIComponent(selectedParty)}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setAddress(data.address || "");
-        })
-        .catch((err) => {
-          console.error("Address fetch error:", err);
-          setAddress("");
-        });
+    if (!selectedParty) {
+      setAddress("");
+      return;
     }
+
+    fetch(`${baseUrl}/getaddress?party=${encodeURIComponent(selectedParty)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Address data:", data);
+        setAddress(data.address || "");
+      })
+      .catch((err) => {
+        console.error("Address fetch error:", err);
+        setAddress("");
+      });
   }, [selectedParty]);
 
   const handlePartyChange = async (party) => {
