@@ -1,12 +1,14 @@
-import DelivaryChalan from "../griege/DelivaryChalan";
 import Delivery from "../griege/Delivery";
 
-function DemoForm() {
+const DemoForm = () => {
   return (
     <>
-      <Delivery />
+      <div className="w-full flex flex-col items-center justify-center">
+        <h2>Hello</h2>
+        <Delivery />
+      </div>
     </>
   );
-}
+};
 
 export default DemoForm;
