@@ -308,7 +308,7 @@ function Delivery() {
 
     // PDF জেনারেট করুন
     html2canvas(input, {
-      scale: 2, // স্কেল বাড়িয়ে 3 বা 4 করুন যাতে রেজোলিউশন ভালো হয়
+      scale: 3, // স্কেল বাড়িয়ে 3 বা 4 করুন যাতে রেজোলিউশন ভালো হয়
       useCORS: true,
       logging: true, // ডিবাগিং এর জন্য লগিং চালু রাখুন
       // windowWidth: input.scrollWidth,  // যদি কন্টেন্ট স্ক্রল হয়, পুরোটা ক্যাপচার করার জন্য
@@ -435,7 +435,7 @@ function Delivery() {
                 return (
                   <div
                     key={tIndex}
-                    className="bg-white p-4 rounded shadow border col-span-1 relative"
+                    className="bg-white p-4 rounded shadow border col-span-1 relative text-sm"
                   >
                     <button
                       className="absolute top-1 right-1 text-red-500 font-bold"
@@ -444,12 +444,12 @@ function Delivery() {
                       ✕
                     </button>
 
-                    <div className="grid grid-cols-3 items-center justify-between text-left">
+                    <div className="grid grid-cols-2 items-center justify-between text-left text-sm">
                       <label className="text-sm font-mono pdf-table-header">
                         Lot Number
                       </label>
                       <select
-                        className="mb-2 border px-2 py-1 rounded col-span-2 pdf-text-replacement"
+                        className="mb-2 border px-2 py-1 rounded col-span-1 text-sm"
                         value={table.lot}
                         onChange={(e) =>
                           handleLotChange(e.target.value, tIndex)
@@ -457,41 +457,39 @@ function Delivery() {
                       >
                         <option value="">Select Lot</option>
                         {lots.map((lot, i) => (
-                          <option key={i} value={lot}>
+                          <option className="text-sm" key={i} value={lot}>
                             {lot}
                           </option>
                         ))}
                       </select>
                     </div>
-                    <div className="grid grid-cols-3 items-center justify-between text-left">
+                    <div className="grid grid-cols-2 items-center justify-between text-left">
                       <label className="text-sm font-mono pdf-table-header">
                         Type
                       </label>
                       <input
                         value={table.type}
                         readOnly
-                        className="mb-2 border px-2 py-1 rounded col-span-2 pdf-text-replacement"
+                        className="mb-2 border px-2 py-1 rounded col-span-1 text-sm"
                         placeholder="Type"
                       />
                     </div>
-                    <div className="grid grid-cols-3 items-center justify-between text-left">
-                      <label className="text-sm font-mono pdf-table-header">
-                        Design
-                      </label>{" "}
+                    <div className="grid grid-cols-2 items-center justify-between text-left">
+                      <label className="text-sm font-mono ">Design</label>{" "}
                       {/* Typo 'Degien' corrected to 'Design' */}
                       <input
                         value={table.design}
                         readOnly
-                        className="mb-2 border px-2 py-1 rounded col-span-2 pdf-text-replacement"
+                        className="mb-2 border px-2 py-1 rounded col-span-1 text-sm"
                         placeholder="Type"
                       />
                     </div>
-                    <div className="grid grid-cols-3 items-center justify-between text-left">
+                    <div className="grid grid-cols-2 items-center justify-between text-left">
                       <label className="text-sm font-mono pdf-table-header">
                         Color
                       </label>
                       <select
-                        className="mb-2 border px-2 py-1 rounded col-span-2 pdf-text-replacement"
+                        className="mb-2 border px-2 py-1 rounded col-span-1 text-sm"
                         value={table.color}
                         onChange={(e) =>
                           handleColorChange(e.target.value, tIndex)
@@ -499,7 +497,7 @@ function Delivery() {
                       >
                         <option value="">Select Color</option>
                         {table.colorOptions.map((color, i) => (
-                          <option key={i} value={color}>
+                          <option className="text-sm" key={i} value={color}>
                             {color}
                           </option>
                         ))}
