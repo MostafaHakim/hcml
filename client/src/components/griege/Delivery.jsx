@@ -314,12 +314,15 @@ function Delivery() {
     fetch(`${baseUrl}/lastchallan`)
       .then((res) => res.json())
       .then((data) => {
-        const lastNo = parseInt(data.lastChallan || "0", 10);
-        setChallanNo(String(lastNo + 1).padStart(3, "0"));
+        if (data.lastChallan) {
+          setChallanNo(data.lastChallan); // পুরো চালান নম্বর: DC-250618004
+        } else {
+          setChallanNo("DC-250618001");
+        }
       })
       .catch((err) => {
         console.error("Challan fetch error:", err);
-        setChallanNo("001");
+        setChallanNo("DC-250618001");
       });
   }, []);
 

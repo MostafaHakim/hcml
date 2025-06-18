@@ -121,12 +121,13 @@ router.get("/lastchallan", async (req, res) => {
       `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getNextChallanNumber`
     );
     const data = await response.json();
-    res.json(data);
+    res.json(data); // { lastChallan: "DC-250618004" }
   } catch (error) {
-    console.error("Error fetching delivery than:", error);
-    res.status(500).json({ error: "Failed to get delivery than list" });
+    console.error("Error fetching challan number:", error);
+    res.status(500).json({ error: "Failed to fetch challan number" });
   }
 });
+
 // ================================POST ROUTE+++++++++++++++++++++++++++++++++++++++++++++++
 // ================================POST ROUTE+++++++++++++++++++++++++++++++++++++++++++++++
 // ================================POST ROUTE+++++++++++++++++++++++++++++++++++++++++++++++
