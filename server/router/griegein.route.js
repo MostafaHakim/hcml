@@ -98,6 +98,7 @@ router.get("/colorres", async (req, res) => {
     res.status(500).json({ error: "Failed to get delivery than list" });
   }
 });
+// =========================================Detailsres=============================================
 router.get("/detailsres", async (req, res) => {
   try {
     const { lot, color } = req.query;
@@ -113,7 +114,21 @@ router.get("/detailsres", async (req, res) => {
     res.status(500).json({ error: "Failed to get delivery than list" });
   }
 });
-
+// =============================================================Chalan Genarate=========================
+router.get("/lastchallan", async (req, res) => {
+  try {
+    const response = await fetch(
+      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getNextChallanNumber`
+    );
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching delivery than:", error);
+    res.status(500).json({ error: "Failed to get delivery than list" });
+  }
+});
+// ================================POST ROUTE+++++++++++++++++++++++++++++++++++++++++++++++
+// ================================POST ROUTE+++++++++++++++++++++++++++++++++++++++++++++++
 // ================================POST ROUTE+++++++++++++++++++++++++++++++++++++++++++++++
 
 router.post("/", async (req, res) => {
