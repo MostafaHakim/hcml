@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import Signature from "./Signature";
+
 const challanData = [
   {
     date: "2025-06-18",
@@ -17,8 +20,23 @@ const challanData = [
 ];
 
 function DelivaryChalan() {
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    try {
+      fetch("https://hcml-ry8s.vercel.app/griegein/delivaryinfo")
+        .then((res) => res.json())
+        .then((data) => setData(data));
+    } catch (error) {
+      console.log(error);
+    }
+    console.log(data);
+  }, []);
   return (
     <div className="w-full flex flex-col items-center justify-center space-y-8">
+      <div className="w-1/3 flex flex-row items-center justify-end">
+        <input type="search" placeholder="Search Your Delivary Chalan" />
+        <button>Search</button>
+      </div>
       <div className="max-w-6xl mx-auto p-6 bg-white shadow-md border rounded-lg">
         {/* Header */}
         <div className="flex items-center justify-center border-b pb-4 mb-6">
@@ -57,6 +75,7 @@ function DelivaryChalan() {
                 <th className="border px-2 py-1">Party</th>
                 <th className="border px-2 py-1">Type</th>
                 <th className="border px-2 py-1">Design</th>
+                <th className="border px-2 py-1">Total Than</th>
                 <th className="border px-2 py-1">Total Griege</th>
                 <th className="border px-2 py-1">Finishing Griege</th>
                 <th className="border px-2 py-1">Comments</th>
@@ -67,9 +86,9 @@ function DelivaryChalan() {
                 <tr key={idx} className="text-center">
                   <td className="border px-2 py-1">{item.date}</td>
                   <td className="border px-2 py-1">{item.lotNumber}</td>
-                  <td className="border px-2 py-1">{item.partyName}</td>
                   <td className="border px-2 py-1">{item.type}</td>
                   <td className="border px-2 py-1">{item.design}</td>
+                  <td className="border px-2 py-1">{item.than}</td>
                   <td className="border px-2 py-1">{item.griege}</td>
                   <td className="border px-2 py-1">{item.finishing}</td>
                   <td className="border px-2 py-1">{item.comments}</td>
@@ -81,8 +100,7 @@ function DelivaryChalan() {
 
         {/* Footer */}
         <div className="mt-8 text-right">
-          <p className="text-sm text-gray-600">Authorized Signature</p>
-          <div className="h-10 border-b w-40 float-right mt-1"></div>
+          <Signature />
         </div>
       </div>
     </div>
