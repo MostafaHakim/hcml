@@ -159,10 +159,16 @@ function DelivaryChalan() {
                   <td className="border px-2 py-1">{matchedData[0][5]}</td>
                   <td className="border px-2 py-1">{matchedData.length}</td>
                   <td className="border px-2 py-1">
-                    {matchedData.reduce((sum, r) => sum + Number(r[6] || 0), 0)}
+                    {matchedData.reduce((sum, r) => {
+                      const val = parseFloat(r[6]);
+                      return isNaN(val) ? sum : sum + val;
+                    }, 0)}
                   </td>
                   <td className="border px-2 py-1">
-                    {matchedData.reduce((sum, r) => sum + Number(r[7] || 0), 0)}
+                    {matchedData.reduce((sum, r) => {
+                      const val = parseFloat(r[7]);
+                      return isNaN(val) ? sum : sum + val;
+                    }, 0)}
                   </td>
                   <td className="border px-2 py-1">{matchedData[0][11]}</td>
                 </tr>
