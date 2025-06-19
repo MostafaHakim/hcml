@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import CompanyPad from "./CompanyPad";
-import Signature from "./Signature";
 
 const baseUrl = "https://hcml-ry8s.vercel.app/griegein";
 
@@ -429,8 +428,6 @@ function Delivery() {
                       placeholder="Enter any additional comments..."
                     />
                   </div>
-
-                  <Signature />
                 </>
               )}
             </div>
