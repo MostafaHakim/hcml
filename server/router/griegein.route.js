@@ -127,6 +127,19 @@ router.get("/lastchallan", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch challan number" });
   }
 });
+// ==========================Delivary Info==========================================================================
+router.get("/delivaryinfo", async (req, res) => {
+  try {
+    const response = await fetch(
+      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=delivaryInfo`
+    );
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching challan number:", error);
+    res.status(500).json({ error: "Failed to fetch challan number" });
+  }
+});
 // =============================================================Address=========================
 router.get("/getaddress", async (req, res) => {
   const party = req.query.party;
