@@ -6,6 +6,8 @@ import Store from "./pages/Store";
 import StoreMaintain from "./pages/StoreMaintain";
 import Home from "./pages/Home";
 import Login from "./components/Login";
+import DelivaryFrom from "./components/griege/DeliveryForm";
+import Delivery from "./components/griege/Delivery";
 
 // Griege
 import GriegeinForm from "./components/griege/GriegeinForm";
@@ -25,6 +27,8 @@ import DeliveredDyes from "./components/DeliveredDyes";
 import ColorPurchase from "./components/ColorPurchase";
 import Lot from "./components/Lot";
 import DeliveryForm from "./components/griege/DeliveryForm";
+import PakingList from "./components/griege/PakingList";
+import DelivaryChalan from "./components/griege/DelivaryChalan";
 
 function App() {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -52,6 +56,10 @@ function App() {
               <Route path="griege/received/:lotnumber" element={<Lot />} />
               <Route path="dyes/demand" element={<Costing />} />
               <Route path="dyes/purchase" element={<ColorPurchase />} />
+              <Route path="delivery/mark" element={<DelivaryFrom />} />
+              <Route path="delivery/delivary" element={<Delivery />} />
+              <Route path="delivery/pakinglist" element={<PakingList />} />
+              <Route path="delivery/calan" element={<DelivaryChalan />} />
             </Route>
 
             <Route path="griege" element={<Griege />}>

@@ -6,7 +6,7 @@ body {
   margin: 0;
   height: 100vh;
   background: linear-gradient(-45deg, #667eea, #764ba2, #6b8dd6, #e0c3fc);
-  background-size: 400% 400%;
+  background-size: 100% 100%;
   animation: gradientBG 15s ease infinite;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
@@ -41,34 +41,3 @@ body {
 }
 
 /* =========================================== */
-.container {
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 20px;
-  font-family: "Nirmala UI", Arial, sans-serif;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-}
-
-select,
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.message {
-  margin-top: 20px;
-  padding: 10px;
-  background-color: #e8f0fe;
-  border-left: 4px solid #4285f4;
-}

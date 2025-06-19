@@ -9,6 +9,11 @@ function Sidepanel() {
       path: "griege",
     },
     { panelName: "Dyes", menuItem: ["demand", "purchase"], path: "dyes" },
+    {
+      panelName: "Delivery",
+      menuItem: ["mark", "delivary", "pakinglist", "calan"],
+      path: "delivery",
+    },
   ]);
   return (
     <div className="w-full shadow-lg shadow-black h-screen p-4 space-y-4">
