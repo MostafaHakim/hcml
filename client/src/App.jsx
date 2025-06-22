@@ -31,6 +31,7 @@ import PakingList from "./components/griege/PakingList";
 import DelivaryChalan from "./components/griege/DelivaryChalan";
 import DeliveryReport from "./components/griege/report/DeliveryReport";
 import Allparty from "./components/party/Allparty";
+import Profile from "./components/party/Profile";
 
 function App() {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -64,6 +65,7 @@ function App() {
               <Route path="delivery/pakinglist" element={<PakingList />} />
               <Route path="delivery/calan" element={<DelivaryChalan />} />
               <Route path="party/allparty" element={<Allparty />} />
+              <Route path="party/:id" element={<Profile />} />
             </Route>
 
             <Route path="griege" element={<Griege />}>
