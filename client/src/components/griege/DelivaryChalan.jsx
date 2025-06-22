@@ -168,7 +168,7 @@ function DeliveryChallan() {
             <table className="min-w-full table-auto border border-gray-300 text-sm">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="border px-2 py-1">Date</th>
+                  <th className="border px-2 py-1">Griege Received Date</th>
                   <th className="border px-2 py-1">Lot No</th>
                   <th className="border px-2 py-1">Type</th>
                   <th className="border px-2 py-1">Design</th>
