@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   PieChart,
   Pie,
@@ -14,7 +14,7 @@ function Profile() {
   const [demand, setDemand] = useState([]);
   const [groupedData, setGroupedData] = useState([]);
   const { id } = useParams();
-
+  const navigate = useNavigate();
   // Fetch party details
   useEffect(() => {
     fetch(`https://hcml-ry8s.vercel.app/party/partydetails`)
@@ -132,6 +132,15 @@ function Profile() {
 
   return (
     <div className="p-6 w-full mx-auto bg-white rounded-lg shadow-md space-y-8">
+      <div className="flex flex-row items-start justify-end">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          ← Back
+        </button>
+      </div>
       <h2 className="text-2xl font-bold mb-4 text-center text-blue-800">
         {partyName}
       </h2>
