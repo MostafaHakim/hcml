@@ -29,6 +29,7 @@ import Lot from "./components/Lot";
 import DeliveryForm from "./components/griege/DeliveryForm";
 import PakingList from "./components/griege/PakingList";
 import DelivaryChalan from "./components/griege/DelivaryChalan";
+import DeliveryReport from "./components/griege/report/DeliveryReport";
 
 function App() {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -53,6 +54,7 @@ function App() {
           <Route path="/admin" element={<Home />}>
             <Route path="dashboard" element={<Dashboard />}>
               <Route path="griege/received" element={<GriegeReport />} />
+              <Route path="griege/delivery" element={<DeliveryReport />} />
               <Route path="griege/received/:lotnumber" element={<Lot />} />
               <Route path="dyes/demand" element={<Costing />} />
               <Route path="dyes/purchase" element={<ColorPurchase />} />
