@@ -31,7 +31,7 @@ function Sidepanel({ closeSidebar }) {
     },
   ]);
   return (
-    <div className="w-full shadow-lg shadow-black h-screen p-4 space-y-4">
+    <div className="w-full shadow-lg shadow-black  p-4 space-y-4">
       <div className="sm:hidden flex justify-end">
         <button onClick={closeSidebar} className="p-2">
           <X />

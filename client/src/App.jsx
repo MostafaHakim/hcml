@@ -34,6 +34,7 @@ import Allparty from "./components/party/Allparty";
 import Profile from "./components/party/Profile";
 import Stock from "./components/stock/Stock";
 import Allmaster from "./components/master/Allmaster";
+import MasterProfile from "./components/master/MasterProfile";
 
 function App() {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -70,6 +71,7 @@ function App() {
               <Route path="party/allparty" element={<Allparty />} />
               <Route path="party/:id" element={<Profile />} />
               <Route path="master/allmaster" element={<Allmaster />} />
+              <Route path="master/:id" element={<MasterProfile />} />
             </Route>
 
             <Route path="griege" element={<Griege />}>
