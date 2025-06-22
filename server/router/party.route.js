@@ -14,6 +14,16 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Failed to get color list" });
   }
 });
+router.get("/partydetails", async (req, res) => {
+  try {
+    const response = await fetch(`${GAS_BASE_URL}?action=partyDetails`);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching colors:", error);
+    res.status(500).json({ error: "Failed to get color list" });
+  }
+});
 router.get("/alldata", async (req, res) => {
   try {
     const response = await fetch(`${GAS_BASE_URL}?action=alldata`);

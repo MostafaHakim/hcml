@@ -15,21 +15,25 @@ function Sidepanel({ closeSidebar }) {
       menuItem: ["mark", "delivary", "pakinglist", "calan"],
       path: "delivery",
     },
+    {
+      panelName: "Party",
+      menuItem: ["allparty"],
+      path: "party",
+    },
   ]);
   return (
     <div className="w-full shadow-lg shadow-black h-screen p-4 space-y-4">
       <div className="sm:hidden flex justify-end">
-        <Link
-          to="/"
-          className="px-6 py-2 ring-2 ring-white ring-inset rounded-tl-full rounded-br-full bg-blue-600 font-serif text-white "
-        >
-          HCML
-        </Link>
         <button onClick={closeSidebar} className="p-2">
           <X />
         </button>
       </div>
-
+      <Link
+        to="/"
+        className="px-6 py-2 ring-2 ring-white ring-inset rounded-tl-full rounded-br-full bg-blue-600 font-serif text-white "
+      >
+        HCML
+      </Link>
       {panelItem.map((element) => {
         return (
           <div className="bg-white bg-opacity-30 border-[1px] border-white shadow-md rounded-md text-black px-1 py-2">
