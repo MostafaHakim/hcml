@@ -6,28 +6,22 @@ body {
   margin: 0;
   height: 100vh;
   background: linear-gradient(-45deg, #667eea, #764ba2, #6b8dd6, #e0c3fc);
-  background-size: 100% 100%;
+  background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-
   text-align: center;
 }
 
-/* styles.css */
-.input-style {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+@layer components {
+  .input-style {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
 }
 
-.input {
-  border: 1px solid #ccc;
-  padding: 6px 10px;
-  border-radius: 4px;
-  width: 100%;
-}
 @keyframes gradientBG {
   0% {
     background-position: 0% 50%;
@@ -39,5 +33,3 @@ body {
     background-position: 0% 50%;
   }
 }
-
-/* =========================================== */
