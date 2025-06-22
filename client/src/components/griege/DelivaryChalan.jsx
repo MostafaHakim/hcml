@@ -3,12 +3,16 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Signature from "./Signature";
 
-function DelivaryChalan() {
+function DeliveryChallan() {
   const [groupedData, setGroupedData] = useState({});
   const [searchText, setSearchText] = useState("");
-  const [searchedChalan, setSearchedChalan] = useState("");
+  const [searchedChallan, setSearchedChallan] = useState("");
+  const [address, setAddress] = useState("");
+  const [demand, setDemand] = useState([]);
+
   const chalanRef = useRef();
 
+  // Fetch data on load
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -36,14 +40,13 @@ function DelivaryChalan() {
   }, []);
 
   const handleSearch = () => {
-    setSearchedChalan(searchText.trim());
+    setSearchedChallan(searchText.trim());
   };
 
   const handleDownloadPDF = async () => {
     const element = chalanRef.current;
     if (!element) return;
 
-    // Increase scale for better resolution
     const canvas = await html2canvas(element, { scale: 2, useCORS: true });
     const imgData = canvas.toDataURL("image/png");
 
@@ -58,7 +61,6 @@ function DelivaryChalan() {
     let heightLeft = imgHeight;
     let position = 0;
 
-    // If content is longer than one page, split into multiple pages
     while (heightLeft > 0) {
       pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
       heightLeft -= pdfHeight;
@@ -68,10 +70,36 @@ function DelivaryChalan() {
       }
     }
 
-    pdf.save(`${searchedChalan}_DeliveryChalan.pdf`);
+    pdf.save(`${searchedChallan}_DeliveryChallan.pdf`);
   };
 
-  const matchedData = searchedChalan ? groupedData[searchedChalan] : null;
+  const matchedData = searchedChallan ? groupedData[searchedChallan] : null;
+
+  useEffect(() => {
+    fetch(`https://hcml-ry8s.vercel.app/demand`)
+      .then((res) => res.json())
+      .then((data) => {
+        setDemand(data);
+      });
+  }, []);
+
+  // Fetch address when matched data changes
+  useEffect(() => {
+    if (!matchedData?.length) {
+      setAddress("");
+      return;
+    }
+
+    const partyName = matchedData[0][3];
+    fetch(
+      `https://hcml-ry8s.vercel.app/griegein/getaddress?party=${encodeURIComponent(
+        partyName
+      )}`
+    )
+      .then((res) => res.json())
+      .then((data) => setAddress(data?.address || ""))
+      .catch(() => setAddress(""));
+  }, [searchedChallan]);
 
   return (
     <div className="w-full flex flex-col items-center justify-center space-y-8 p-6">
@@ -82,6 +110,7 @@ function DelivaryChalan() {
           placeholder="Enter Delivery Challan No"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           className="border px-3 py-2 rounded w-full"
         />
         <button
@@ -113,17 +142,19 @@ function DelivaryChalan() {
           <div className="flex flex-row justify-between mb-4">
             <div className="flex space-x-2">
               <span className="font-semibold">Delivery Date:</span>
-              <span>{new Date(matchedData[0][0]).toLocaleDateString()}</span>
+              <span>
+                {new Date(matchedData[0][0]).toLocaleDateString("en-GB")}
+              </span>
             </div>
             <div className="text-center">
               <div className="font-bold text-lg text-gray-900">
                 {matchedData[0][3]}
               </div>
-              <div className="text-md text-gray-700">Islam Pur</div>
+              <div className="text-md text-gray-700">{address}</div>
             </div>
             <div className="flex space-x-2">
               <span className="font-semibold">Challan No:</span>
-              <span>{searchedChalan}</span>
+              <span>{searchedChallan}</span>
             </div>
           </div>
 
@@ -139,7 +170,6 @@ function DelivaryChalan() {
                 <tr>
                   <th className="border px-2 py-1">Date</th>
                   <th className="border px-2 py-1">Lot No</th>
-                  <th className="border px-2 py-1">Party</th>
                   <th className="border px-2 py-1">Type</th>
                   <th className="border px-2 py-1">Design</th>
                   <th className="border px-2 py-1">Total Than</th>
@@ -151,10 +181,18 @@ function DelivaryChalan() {
               <tbody>
                 <tr className="text-center">
                   <td className="border px-2 py-1">
-                    {new Date(matchedData[0][0]).toLocaleDateString()}
+                    {demand.map((item, i) => {
+                      if (
+                        item["Party's Name"] == matchedData[0][3] &&
+                        item["Lot Number"] == matchedData[0][2]
+                      ) {
+                        return new Date(item["Date"]).toLocaleDateString(
+                          "en-GB"
+                        );
+                      }
+                    })}
                   </td>
                   <td className="border px-2 py-1">{matchedData[0][2]}</td>
-                  <td className="border px-2 py-1">{matchedData[0][3]}</td>
                   <td className="border px-2 py-1">{matchedData[0][4]}</td>
                   <td className="border px-2 py-1">{matchedData[0][5]}</td>
                   <td className="border px-2 py-1">{matchedData.length}</td>
@@ -181,9 +219,9 @@ function DelivaryChalan() {
             <Signature />
           </div>
         </div>
-      ) : searchedChalan ? (
+      ) : searchedChallan ? (
         <p className="text-red-600 font-semibold">
-          No challan found with: {searchedChalan}
+          No challan found with: {searchedChallan}
         </p>
       ) : null}
 
@@ -208,4 +246,4 @@ function DelivaryChalan() {
   );
 }
 
-export default DelivaryChalan;
+export default DeliveryChallan;
