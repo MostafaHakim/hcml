@@ -39,6 +39,7 @@ function Login() {
     if (user) {
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("username", user["USER NAME"]);
+      localStorage.setItem("fullName", user["FULL NAME"]);
       localStorage.setItem("role", user["ROLE"]);
 
       if (user["ROLE"] === "Admin") {
