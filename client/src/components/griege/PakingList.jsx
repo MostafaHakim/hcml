@@ -117,6 +117,7 @@ function PackingList() {
 
   return (
     <div className="w-full flex flex-col items-center justify-center space-y-8 p-6 font-inter">
+      {/* Search Box */}
       <div className="w-full max-w-md flex flex-row items-center justify-end gap-2">
         <input
           type="search"
@@ -134,8 +135,10 @@ function PackingList() {
         </button>
       </div>
 
+      {/* Loading */}
       {loading && <p className="text-blue-600 text-lg">Loading data...</p>}
 
+      {/* Display matchedData (Packing List View) */}
       {matchedData ? (
         <div
           ref={chalanRef}
@@ -326,11 +329,47 @@ function PackingList() {
           the challan number and try again.
         </p>
       ) : (
-        <p className="text-gray-600 text-lg mt-8">
-          Please enter a Challan Number to view the packing list.
-        </p>
+        // Show All Challans When Nothing is Searched
+        <div className="w-full max-w-3xl mt-8">
+          <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+            All Available Pakinglist
+          </h3>
+          <div className="space-y-2">
+            {Object.entries(groupedData).map(([chalanNo, rows]) => (
+              <div
+                key={chalanNo}
+                onClick={() => setSearchedChalan(chalanNo)}
+                className="cursor-pointer bg-white hover:bg-blue-50 border border-gray-300 rounded-md p-3 shadow-sm transition grid grid-cols-5 text-left"
+              >
+                <div className="text-md text-gray-900 font-bold col-span-2">
+                  Pakinglist No: {chalanNo}
+                </div>
+                <div className="text-sm text-gray-700 col-span-1">
+                  Date: {new Date(rows[0][0]).toLocaleDateString("en-BD")}
+                </div>
+                <div className="text-sm text-gray-700 col-span-2">
+                  Party: {rows[0][3]}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
+      {/* Back Button */}
+      {searchedChalan && matchedData && (
+        <button
+          onClick={() => {
+            setSearchedChalan("");
+            setSearchText("");
+          }}
+          className="mt-6 bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400"
+        >
+          🔙 Back to All Pakinglist
+        </button>
+      )}
+
+      {/* PDF / Print Buttons */}
       {matchedData && (
         <div className="flex gap-4 justify-center mt-8">
           <button

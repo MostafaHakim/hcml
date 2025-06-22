@@ -30,7 +30,7 @@ function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="col-span-4 sm:col-span-3 md:col-span-4 lg:col-span-10 p-4 overflow-y-auto">
+      <div className="col-span-4 sm:col-span-3 md:col-span-4 lg:col-span-10 p-2 overflow-y-auto">
         <Outlet />
       </div>
     </div>
