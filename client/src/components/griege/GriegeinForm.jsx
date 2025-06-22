@@ -5,6 +5,9 @@ export default function LotEntryForm() {
   const [allData, setAllData] = useState([]);
   const [masterList, setMasterList] = useState([]);
   const [thans, setThans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitLoading, setSubmitLoading] = useState(false); // ✅ added
+
   const [form, setForm] = useState({
     lotNo: "",
     date: "",
@@ -14,55 +17,40 @@ export default function LotEntryForm() {
     unit: "",
     action: [],
     tempThanGaj: "",
-    master: "", // new field
+    master: "",
   });
 
   useEffect(() => {
-    const getNextLotNo = async () => {
+    const fetchAll = async () => {
       try {
-        const res = await fetch("https://hcml-ry8s.vercel.app/griegein");
-        const data = await res.json();
-        const nextLot = parseInt(data) + 1;
+        const [lotRes, partyAllRes, partyRes, masterRes] = await Promise.all([
+          fetch("https://hcml-ry8s.vercel.app/griegein"),
+          fetch("https://hcml-ry8s.vercel.app/party/alldata"),
+          fetch("https://hcml-ry8s.vercel.app/party"),
+          fetch("https://hcml-ry8s.vercel.app/user/master"),
+        ]);
+
+        const lotData = await lotRes.json();
+        const partyAllData = await partyAllRes.json();
+        const partyList = await partyRes.json();
+        const masterRaw = await masterRes.json();
+
+        const nextLot = parseInt(lotData) + 1;
         setForm((prev) => ({ ...prev, lotNo: nextLot.toString() }));
-      } catch (error) {
-        console.error("Failed to fetch lot data:", error);
-      }
-    };
+        setAllData(partyAllData);
+        setPartyListOptions(partyList);
 
-    getNextLotNo();
-
-    fetch("https://hcml-ry8s.vercel.app/party/alldata")
-      .then((res) => res.json())
-      .then((data) => setAllData(data));
-  }, []);
-
-  useEffect(() => {
-    const getMasterList = async () => {
-      try {
-        const res = await fetch("https://hcml-ry8s.vercel.app/user/master");
-        const data = await res.json();
-        const rows = data.slice(1); // skip header
-        const names = rows.map((row) => row[0]); // Master Name only
+        const masterRows = masterRaw.slice(1);
+        const names = masterRows.map((row) => row[0]);
         setMasterList(names);
-      } catch (error) {
-        console.error("Failed to fetch master list:", error);
+      } catch (err) {
+        console.error("Loading error:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    getMasterList();
-  }, []);
-
-  useEffect(() => {
-    const getAllParty = async () => {
-      try {
-        const res = await fetch("https://hcml-ry8s.vercel.app/party");
-        const data = await res.json();
-        setPartyListOptions(data);
-      } catch (error) {
-        console.error("Failed to fetch party data:", error);
-      }
-    };
-    getAllParty();
+    fetchAll();
   }, []);
 
   const handleChange = (e) => {
@@ -89,6 +77,7 @@ export default function LotEntryForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitLoading(true); // ✅ Start loading
 
     const totalGaj = thans.reduce((sum, val) => sum + parseFloat(val || 0), 0);
 
@@ -99,7 +88,7 @@ export default function LotEntryForm() {
       fabric: form.fabric,
       quality: form.quality,
       unit: form.unit,
-      master: form.master, // include master name
+      master: form.master,
       than: thans.length.toString(),
       totalGaj: totalGaj.toString(),
       action: form.action.join(", "),
@@ -128,7 +117,6 @@ export default function LotEntryForm() {
       if (result.result === "success") {
         alert("Data saved successfully!");
 
-        // get next lot again after success
         const res = await fetch("https://hcml-ry8s.vercel.app/griegein");
         const data = await res.json();
         const nextLot = parseInt(data) + 1;
@@ -142,6 +130,7 @@ export default function LotEntryForm() {
           unit: "",
           action: [],
           tempThanGaj: "",
+          master: "",
         });
         setThans([]);
       } else {
@@ -149,16 +138,25 @@ export default function LotEntryForm() {
       }
     } catch (error) {
       alert("Error: " + error.message);
+    } finally {
+      setSubmitLoading(false); // ✅ End loading
     }
   };
 
-  // Filter unique and non-empty actions
   const rows = allData.slice(1);
   const processOptions = Array.from(
     new Set(
       rows.map((row) => row[2]).filter((item) => item && item.trim() !== "")
     )
   );
+
+  if (loading) {
+    return (
+      <div className="text-center py-10 text-gray-600 animate-pulse">
+        Loading form data...
+      </div>
+    );
+  }
 
   return (
     <form
@@ -288,7 +286,6 @@ export default function LotEntryForm() {
                 checked={form.action.includes(option)}
                 onChange={handleCheckboxChange}
               />
-
               <span className="text-sm font-normal">{option}</span>
             </label>
           ))}
@@ -297,9 +294,34 @@ export default function LotEntryForm() {
 
       <button
         type="submit"
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center justify-center gap-2"
+        disabled={submitLoading}
       >
-        Submit
+        {submitLoading ? (
+          <>
+            <svg
+              className="animate-spin h-4 w-4 text-white"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8z"
+              />
+            </svg>
+            Submitting...
+          </>
+        ) : (
+          "Submit"
+        )}
       </button>
     </form>
   );
