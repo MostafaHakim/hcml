@@ -167,7 +167,7 @@ function MasterProfile() {
   return (
     <div className="p-6 mx-auto w-full">
       {/* Profile Card */}
-      <div className="bg-white shadow-lg rounded-lg p-6 mb-10 border">
+      <div className="bg-white shadow-lg rounded-lg p-6 mb-2 border">
         <h2 className="text-3xl font-bold text-blue-700 text-center mb-6">
           👤 {masterName}
         </h2>
@@ -184,7 +184,7 @@ function MasterProfile() {
       </div>
 
       {/* Pie Chart */}
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-10 border w-full max-w-3xl mx-auto">
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-2 border w-full  mx-auto">
         <h3 className="text-xl font-semibold mb-4 text-center text-gray-800">
           Grey Delivery Status
         </h3>
@@ -197,7 +197,7 @@ function MasterProfile() {
       </div>
 
       {/* Assigned Lots */}
-      <div className="mb-10">
+      <div className="mb-2 bg-white p-4 rounded-lg">
         <h3 className="text-2xl font-semibold text-gray-800 mb-4">
           📦 Assigned Greige Lots
         </h3>
@@ -206,8 +206,8 @@ function MasterProfile() {
             No lots assigned to this master yet.
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-9 bg-gray-100 font-bold text-sm p-2 rounded-t">
+          <div className="shadow-lg">
+            <div className="grid grid-cols-9 bg-blue-100 font-bold text-sm p-2 rounded-t">
               <div className="col-span-1">Date</div>
               <div className="col-span-1">Lot No</div>
               <div className="col-span-2">Party</div>
@@ -243,12 +243,12 @@ function MasterProfile() {
                 </Link>
               );
             })}
-          </>
+          </div>
         )}
       </div>
 
       {/* Delivery Info */}
-      <div>
+      <div className="bg-white p-4 rounded-lg">
         <h3 className="text-2xl font-semibold text-blue-700 pb-2">
           🚚 Greige Delivery Details
         </h3>
@@ -261,7 +261,7 @@ function MasterProfile() {
           ).length === 0 ? (
           <p className="text-center text-gray-500 py-4">No delivery data.</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto shadow-lg">
             <table className="min-w-full table-auto border text-sm">
               <thead className="bg-blue-100">
                 <tr>
