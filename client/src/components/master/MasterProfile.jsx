@@ -9,45 +9,14 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const COLORS = ["#0088FE", "#FF8042"]; // Received = Blue, Remaining = Orange
-
-const renderCustomizedLabel = ({
-  cx,
-  cy,
-  midAngle,
-  innerRadius,
-  outerRadius,
-  percent,
-  index,
-  name,
-}) => {
-  const RADIAN = Math.PI / 180;
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-  return (
-    <text
-      x={x}
-      y={y}
-      fill="black"
-      stroke="white"
-      strokeWidth={0.5}
-      textAnchor={x > cx ? "start" : "end"}
-      dominantBaseline="central"
-      fontSize={12}
-      fontWeight="bold"
-    >
-      {`${name} ${(percent * 100).toFixed(0)}%`}
-    </text>
-  );
-};
-
-function MasterProfileChart({ received, remaining }) {
+// Pie Chart Component
+function MasterProfileChart({ delivered, remaining }) {
   const data = [
-    { name: "Received Grey", value: received },
-    { name: "Remaining Grey", value: remaining },
+    { name: `Delivered (${delivered} yds)`, value: delivered },
+    { name: `Remaining (${remaining} yds)`, value: remaining },
   ];
+
+  const COLORS = ["#0088FE", "#FF8042"]; // Blue = Delivered, Orange = Remaining
 
   return (
     <div style={{ width: "100%", height: 300 }}>
@@ -60,11 +29,10 @@ function MasterProfileChart({ received, remaining }) {
             cx="50%"
             cy="50%"
             outerRadius={100}
-            labelLine={true}
             label={({ name, percent }) =>
-              `${name}: ${(percent * 100).toFixed(0)}%`
+              `${name} (${(percent * 100).toFixed(0)}%)`
             }
-            labelPosition="outside"
+            labelLine={false}
             fill="#8884d8"
           >
             {data.map((entry, index) => (
@@ -74,8 +42,8 @@ function MasterProfileChart({ received, remaining }) {
               />
             ))}
           </Pie>
-          <Tooltip />
-          <Legend verticalAlign="bottom" height={36} />
+          <Tooltip formatter={(value, name) => [`${value} yds`, name]} />
+          <Legend />
         </PieChart>
       </ResponsiveContainer>
     </div>
@@ -88,8 +56,7 @@ function MasterProfile() {
 
   const [data, setData] = useState([]);
   const [griege, setGriege] = useState([]);
-  const [groupedData, setGroupedData] = useState([]);
-  const [filteredDelivery, setFilteredDelivery] = useState([]);
+  const [deliveryData, setDeliveryData] = useState([]);
   const [loadingDelivery, setLoadingDelivery] = useState(false);
 
   // Fetch master data
@@ -108,7 +75,7 @@ function MasterProfile() {
       .catch((err) => console.error("Failed to fetch greige data", err));
   }, []);
 
-  // Fetch delivery info
+  // Fetch and group delivery info by Chalan No and Lot Number
   useEffect(() => {
     setLoadingDelivery(true);
     fetch("https://hcml-ry8s.vercel.app/griegein/delivaryinfo")
@@ -126,41 +93,39 @@ function MasterProfile() {
               }, {})
             );
 
+          // ✅ Group by Chalan No and Lot Number and count Than by number of rows
           const grouped = Object.values(
             formatted.reduce((acc, curr) => {
               const key = `${curr["Chalan No"]}-${curr["Lot Number"]}`;
               if (!acc[key]) {
                 acc[key] = {
-                  ...curr,
-                  totalGriege: isNaN(Number(curr["Griege"]))
-                    ? 0
-                    : Number(curr["Griege"]),
-                  totalFinishing: isNaN(Number(curr["Finishing"]))
-                    ? 0
-                    : Number(curr["Finishing"]),
+                  Date: curr["Date"],
+                  "Chalan No": curr["Chalan No"],
+                  "Lot Number": curr["Lot Number"],
+                  Type: curr["Type"],
+                  Design: curr["Design"],
+                  Griege: Number(curr["Griege"]) || 0,
+                  Finishing: Number(curr["Finishing"]) || 0,
+                  Than: 1,
                 };
               } else {
-                acc[key].totalGriege += isNaN(Number(curr["Griege"]))
-                  ? 0
-                  : Number(curr["Griege"]);
-                acc[key].totalFinishing += isNaN(Number(curr["Finishing"]))
-                  ? 0
-                  : Number(curr["Finishing"]);
+                acc[key].Griege += Number(curr["Griege"]) || 0;
+                acc[key].Finishing += Number(curr["Finishing"]) || 0;
+                acc[key].Than += 1;
               }
               return acc;
             }, {})
           );
 
-          setGroupedData(grouped);
+          setDeliveryData(grouped);
         } else {
-          setGroupedData([]);
+          setDeliveryData([]);
         }
       })
-      .catch(() => setGroupedData([]))
+      .catch(() => setDeliveryData([]))
       .finally(() => setLoadingDelivery(false));
   }, []);
 
-  // Prepare master and assignedLots
   const headers = data[0] || [];
   const rows = data.length > 1 ? data.slice(1) : [];
   const master = rows.find((row) => row[2]?.toString() === id);
@@ -174,38 +139,34 @@ function MasterProfile() {
     return assignedLots.map((lot) => lot["Lot Number"]);
   }, [assignedLots]);
 
-  // Filter delivery info by lot numbers
-  useEffect(() => {
-    const filtered = groupedData.filter((item) =>
-      assignedLotNumbers.includes(item["Lot Number"])
+  const totalDelivered = useMemo(() => {
+    return deliveryData
+      .filter((item) => assignedLotNumbers.includes(item["Lot Number"]))
+      .reduce((sum, item) => sum + item.Griege, 0);
+  }, [deliveryData, assignedLotNumbers]);
+
+  const totalAssigned = useMemo(() => {
+    return assignedLots.reduce(
+      (sum, item) => sum + (Number(item["Received Grey"]) || 0),
+      0
     );
-    setFilteredDelivery(filtered);
-  }, [groupedData, assignedLotNumbers]);
+  }, [assignedLots]);
 
-  // Calculate totals for pie chart
-  const totalReceived = filteredDelivery.reduce(
-    (sum, item) => sum + (item.totalGriege || 0),
-    0
-  );
+  const remaining = Math.max(totalAssigned - totalDelivered, 0);
 
-  const totalAssigned = assignedLots.reduce(
-    (sum, item) => sum + (Number(item["Than"]) || 0),
-    0
-  );
-
-  const remaining = Math.max(totalAssigned - totalReceived, 0);
-
-  if (data.length === 0)
+  if (data.length === 0) {
     return <div className="p-6 text-center">Loading profile...</div>;
+  }
 
-  if (!master)
+  if (!master) {
     return (
       <div className="p-6 text-red-600 text-center">Master not found!</div>
     );
+  }
 
   return (
     <div className="p-6 mx-auto w-full">
-      {/* Master Profile */}
+      {/* Profile Card */}
       <div className="bg-white shadow-lg rounded-lg p-6 mb-10 border">
         <h2 className="text-3xl font-bold text-blue-700 text-center mb-6">
           👤 {masterName}
@@ -223,11 +184,16 @@ function MasterProfile() {
       </div>
 
       {/* Pie Chart */}
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-10 border w-full mx-auto">
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-10 border w-full max-w-3xl mx-auto">
         <h3 className="text-xl font-semibold mb-4 text-center text-gray-800">
-          Grey Received vs Remaining
+          Grey Delivery Status
         </h3>
-        <MasterProfileChart received={totalReceived} remaining={remaining} />
+        <MasterProfileChart delivered={totalDelivered} remaining={remaining} />
+        <div className="mt-4 text-center">
+          <p className="font-semibold">Total Assigned: {totalAssigned} yds</p>
+          <p className="text-blue-600">Delivered: {totalDelivered} yds</p>
+          <p className="text-orange-500">Remaining: {remaining} yds</p>
+        </div>
       </div>
 
       {/* Assigned Lots */}
@@ -241,34 +207,42 @@ function MasterProfile() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-8 bg-gray-100 font-bold text-sm p-2 rounded-t">
+            <div className="grid grid-cols-9 bg-gray-100 font-bold text-sm p-2 rounded-t">
               <div className="col-span-1">Date</div>
               <div className="col-span-1">Lot No</div>
               <div className="col-span-2">Party</div>
-              <div className="col-span-1">Than</div>
-              <div className="col-span-1">Received</div>
               <div className="col-span-1">Type</div>
               <div className="col-span-1">Design</div>
+              <div className="col-span-1">Than</div>
+              <div className="col-span-1">Received</div>
+              <div className="col-span-1">Delivered</div>
             </div>
-            {assignedLots.map((item, i) => (
-              <Link
-                key={item["Lot Number"] + i}
-                to={`/admin/dashboard/griege/received/${item["Lot Number"]}`}
-                className={`grid grid-cols-8 text-sm p-2 transition-all duration-150 hover:bg-blue-600 hover:text-white ${
-                  i % 2 ? "bg-white" : "bg-gray-50"
-                }`}
-              >
-                <div className="col-span-1">
-                  {new Date(item["Date"]).toLocaleDateString()}
-                </div>
-                <div className="col-span-1">{item["Lot Number"]}</div>
-                <div className="col-span-2">{item["Party's Name"]}</div>
-                <div className="col-span-1">{item["Than"]}</div>
-                <div className="col-span-1">{item["Received Grey"]}</div>
-                <div className="col-span-1">{item["Type"]}</div>
-                <div className="col-span-1">{item["Design"]}</div>
-              </Link>
-            ))}
+            {assignedLots.map((item, i) => {
+              const lotDelivered = deliveryData
+                .filter((d) => d["Lot Number"] === item["Lot Number"])
+                .reduce((sum, d) => sum + d.Griege, 0);
+
+              return (
+                <Link
+                  key={item["Lot Number"] + i}
+                  to={`/admin/dashboard/griege/received/${item["Lot Number"]}`}
+                  className={`grid grid-cols-9 text-sm p-2 transition-all duration-150 hover:bg-blue-600 hover:text-white ${
+                    i % 2 ? "bg-white" : "bg-gray-50"
+                  }`}
+                >
+                  <div className="col-span-1">
+                    {new Date(item["Date"]).toLocaleDateString()}
+                  </div>
+                  <div className="col-span-1">{item["Lot Number"]}</div>
+                  <div className="col-span-2">{item["Party's Name"]}</div>
+                  <div className="col-span-1">{item["Type"]}</div>
+                  <div className="col-span-1">{item["Design"]}</div>
+                  <div className="col-span-1">{item["Than"]}</div>
+                  <div className="col-span-1">{item["Received Grey"]}</div>
+                  <div className="col-span-1">{lotDelivered}</div>
+                </Link>
+              );
+            })}
           </>
         )}
       </div>
@@ -276,13 +250,15 @@ function MasterProfile() {
       {/* Delivery Info */}
       <div>
         <h3 className="text-2xl font-semibold text-blue-700 pb-2">
-          🚚 Greige Delivered
+          🚚 Greige Delivery Details
         </h3>
         {loadingDelivery ? (
           <p className="text-center text-gray-500 py-4">
             Loading delivery data...
           </p>
-        ) : filteredDelivery.length === 0 ? (
+        ) : deliveryData.filter((item) =>
+            assignedLotNumbers.includes(item["Lot Number"])
+          ).length === 0 ? (
           <p className="text-center text-gray-500 py-4">No delivery data.</p>
         ) : (
           <div className="overflow-x-auto">
@@ -290,38 +266,44 @@ function MasterProfile() {
               <thead className="bg-blue-100">
                 <tr>
                   <th className="border px-2 py-1">Date</th>
-                  <th className="border px-2 py-1">Challan</th>
-                  <th className="border px-2 py-1">Lot</th>
+                  <th className="border px-2 py-1">Challan No</th>
+                  <th className="border px-2 py-1">Lot No</th>
                   <th className="border px-2 py-1">Type</th>
                   <th className="border px-2 py-1">Design</th>
-                  <th className="border px-2 py-1">Greige</th>
-                  <th className="border px-2 py-1">Finishing</th>
+                  <th className="border px-2 py-1">Than</th>
+                  <th className="border px-2 py-1">Greige (yds)</th>
+                  <th className="border px-2 py-1">Finishing (yds)</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredDelivery.map((item, i) => (
-                  <tr
-                    key={`${item["Chalan No"]}-${item["Lot Number"]}-${i}`}
-                    className={`text-sm p-2 transition-all duration-150 hover:bg-blue-600 hover:text-white ${
-                      i % 2 ? "bg-white" : "bg-gray-50"
-                    }`}
-                    onClick={() =>
-                      navigate(
-                        `/admin/dashboard/griege/received/${item["Lot Number"]}`
-                      )
-                    }
-                  >
-                    <td className="border px-2 py-1">
-                      {new Date(item.Date).toLocaleDateString("en-GB")}
-                    </td>
-                    <td className="border px-2 py-1">{item["Chalan No"]}</td>
-                    <td className="border px-2 py-1">{item["Lot Number"]}</td>
-                    <td className="border px-2 py-1">{item.Type}</td>
-                    <td className="border px-2 py-1">{item.Design}</td>
-                    <td className="border px-2 py-1">{item.totalGriege}</td>
-                    <td className="border px-2 py-1">{item.totalFinishing}</td>
-                  </tr>
-                ))}
+                {deliveryData
+                  .filter((item) =>
+                    assignedLotNumbers.includes(item["Lot Number"])
+                  )
+                  .map((item, i) => (
+                    <tr
+                      key={`${item["Chalan No"]}-${item["Lot Number"]}-${i}`}
+                      className={`text-sm p-2 transition-all duration-150 hover:bg-blue-600 hover:text-white ${
+                        i % 2 ? "bg-white" : "bg-gray-50"
+                      }`}
+                      onClick={() =>
+                        navigate(
+                          `/admin/dashboard/griege/received/${item["Lot Number"]}`
+                        )
+                      }
+                    >
+                      <td className="border px-2 py-1">
+                        {new Date(item.Date).toLocaleDateString("en-GB")}
+                      </td>
+                      <td className="border px-2 py-1">{item["Chalan No"]}</td>
+                      <td className="border px-2 py-1">{item["Lot Number"]}</td>
+                      <td className="border px-2 py-1">{item.Type}</td>
+                      <td className="border px-2 py-1">{item.Design}</td>
+                      <td className="border px-2 py-1">{item.Than}</td>
+                      <td className="border px-2 py-1">{item.Griege}</td>
+                      <td className="border px-2 py-1">{item.Finishing}</td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
