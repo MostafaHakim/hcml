@@ -9,7 +9,11 @@ function Sidepanel({ closeSidebar }) {
       menuItem: ["received", "delivery"],
       path: "griege",
     },
-    { panelName: "Dyes", menuItem: ["demand", "purchase"], path: "dyes" },
+    {
+      panelName: "Dyes",
+      menuItem: ["stock", "demand", "purchase"],
+      path: "dyes",
+    },
     {
       panelName: "Delivery",
       menuItem: ["mark", "delivary", "pakinglist", "calan"],
@@ -19,6 +23,11 @@ function Sidepanel({ closeSidebar }) {
       panelName: "Party",
       menuItem: ["allparty"],
       path: "party",
+    },
+    {
+      panelName: "Master",
+      menuItem: ["allmaster"],
+      path: "master",
     },
   ]);
   return (

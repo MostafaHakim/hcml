@@ -32,6 +32,8 @@ import DelivaryChalan from "./components/griege/DelivaryChalan";
 import DeliveryReport from "./components/griege/report/DeliveryReport";
 import Allparty from "./components/party/Allparty";
 import Profile from "./components/party/Profile";
+import Stock from "./components/stock/Stock";
+import Allmaster from "./components/master/Allmaster";
 
 function App() {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -58,6 +60,7 @@ function App() {
               <Route path="griege/received" element={<GriegeReport />} />
               <Route path="griege/delivery" element={<DeliveryReport />} />
               <Route path="griege/received/:lotnumber" element={<Lot />} />
+              <Route path="dyes/stock" element={<Stock />} />
               <Route path="dyes/demand" element={<Costing />} />
               <Route path="dyes/purchase" element={<ColorPurchase />} />
               <Route path="delivery/mark" element={<DelivaryFrom />} />
@@ -66,6 +69,7 @@ function App() {
               <Route path="delivery/calan" element={<DelivaryChalan />} />
               <Route path="party/allparty" element={<Allparty />} />
               <Route path="party/:id" element={<Profile />} />
+              <Route path="master/allmaster" element={<Allmaster />} />
             </Route>
 
             <Route path="griege" element={<Griege />}>
