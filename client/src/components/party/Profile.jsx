@@ -1,118 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import { useParams } from "react-router-dom";
-
-// function Profile() {
-//   const [data, setData] = useState([]);
-//   const [party, setParty] = useState(null);
-//   const [demand, setDemand] = useState([]);
-//   const [groupedData, setGroupedData] = useState([]);
-//   const { id } = useParams();
-//   console.log(demand);
-//   // গ্রে রিসিভিড
-//   useEffect(() => {
-//     fetch(`https://hcml-ry8s.vercel.app/demand`)
-//       .then((res) => res.json())
-//       .then((data) => {
-//         setDemand(data);
-//       });
-//   }, []);
-
-//   useEffect(() => {
-//     fetch(`https://hcml-ry8s.vercel.app/griegein/delivaryinfo`)
-//       .then((res) => res.json())
-//       .then((data) => {
-//         if (Array.isArray(data) && data.length > 1) {
-//           const headers = data[0];
-//           const rows = data.slice(1);
-//           const formatted = rows
-//             .filter((row) => row.length === headers.length)
-//             .map((row) =>
-//               headers.reduce((obj, key, idx) => {
-//                 obj[key] = row[idx];
-//                 return obj;
-//               }, {})
-//             );
-
-//           // Group by Chalan No + Lot Number
-//           const grouped = Object.values(
-//             formatted.reduce((acc, curr) => {
-//               const key = `${curr["Chalan No"]}-${curr["Lot Number"]}`;
-//               if (!acc[key]) {
-//                 acc[key] = {
-//                   ...curr,
-//                   totalGriege: isNaN(Number(curr["Griege"]))
-//                     ? 0
-//                     : Number(curr["Griege"]),
-//                   totalFinishing: isNaN(Number(curr["Finishing"]))
-//                     ? 0
-//                     : Number(curr["Finishing"]),
-//                 };
-//               } else {
-//                 acc[key].totalGriege += isNaN(Number(curr["Griege"]))
-//                   ? 0
-//                   : Number(curr["Griege"]);
-//                 acc[key].totalFinishing += isNaN(Number(curr["Finishing"]))
-//                   ? 0
-//                   : Number(curr["Finishing"]);
-//               }
-//               return acc;
-//             }, {})
-//           );
-
-//           setGroupedData(grouped);
-//         }
-//       });
-//   }, []);
-
-//   useEffect(() => {
-//     fetch(`https://hcml-ry8s.vercel.app/party/partydetails`)
-//       .then((res) => res.json())
-//       .then((data) => {
-//         const rows = data.slice(1); // skip header
-//         const found = rows.find((p) => String(p[2]) === id);
-//         setParty(found);
-//       });
-//   }, [id]);
-
-//   if (!party) {
-//     return (
-//       <div className="p-6 text-center text-gray-600">
-//         <p>Loading profile for ID: {id}...</p>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="p-6 w-full mx-auto bg-white rounded-lg shadow-md">
-//       <h2 className="text-2xl font-bold mb-4 text-center text-blue-800">
-//         {party[0]}
-//       </h2>
-//       <div>
-//         <div>
-//           <div className="space-y-2 text-gray-700 text-md">
-//             <p>
-//               <span className="font-semibold">Address:</span> {party[1]}
-//             </p>
-//             <p>
-//               <span className="font-semibold">Mobile No:</span> {party[2]}
-//             </p>
-//             {/* চাইলে এখানে আরও ইনফো অ্যাড করতে পারো */}
-//           </div>
-//           <div>{/* এখানে গ্রাফ হবে*/}</div>
-//         </div>
-//         <div>
-//           <h2>Grieeg Received</h2>
-//         </div>
-//         <div>
-//           <h2>Griege Deliverd</h2>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default Profile;
-
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
@@ -208,6 +93,7 @@ function Profile() {
 
   const partyName = party[0];
 
+  // Filtered data for this party
   const filteredDemand = demand.filter(
     (item) => item["Party's Name"] === partyName
   );
@@ -215,6 +101,7 @@ function Profile() {
   const filteredDelivery = groupedData.filter(
     (item) => item["Party's Name"] === partyName
   );
+
   const totalReceived = filteredDemand.reduce(
     (sum, item) => sum + (parseFloat(item["Received Grey"]) || 0),
     0
@@ -225,22 +112,30 @@ function Profile() {
     0
   );
 
-  const totalPending = totalReceived - totalDelivered;
+  const totalPending =
+    totalReceived - totalDelivered > 0 ? totalReceived - totalDelivered : 0;
 
+  // Pie chart data only includes Delivered and Pending to show 100% of Received
   const chartData = [
-    { name: "Received", value: totalReceived },
     { name: "Delivered", value: totalDelivered },
-    { name: "Pending", value: totalPending > 0 ? totalPending : 0 },
+    { name: "Pending", value: totalPending },
   ];
 
-  const COLORS = ["#00C49F", "#FFBB28", "#FF8042"];
+  const COLORS = ["#00C49F", "#FF8042"];
+
+  // Pie label renderer showing percentage of totalReceived
+  const renderLabel = ({ name, value }) => {
+    if (totalReceived === 0) return `${name}: 0%`;
+    const percent = (value / totalReceived) * 100;
+    return `${name}: ${percent.toFixed(1)}%`;
+  };
 
   return (
     <div className="p-6 w-full mx-auto bg-white rounded-lg shadow-md space-y-8">
       <h2 className="text-2xl font-bold mb-4 text-center text-blue-800">
         {partyName}
       </h2>
-      <div className=" grid grid-cols-2 items-center justify-center">
+      <div className="grid grid-cols-2 items-center justify-center gap-6">
         {/* Party Info */}
         <div className="text-gray-700 text-md text-start col-span-1 flex flex-col items-start justify-start space-y-2">
           <p>
@@ -250,7 +145,7 @@ function Profile() {
             <span className="font-semibold">Mobile No:</span> {party[2]}
           </p>
         </div>
-        {/* Pie Chart Section */}
+        {/* Pie Chart */}
         <div className="bg-gray-50 p-4 rounded shadow-md mb-6 col-span-1">
           <h3 className="text-lg font-semibold mb-4 text-center text-purple-700">
             Griege Summary (Pie Chart)
@@ -262,11 +157,8 @@ function Profile() {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) =>
-                  `${name}: ${(percent * 100).toFixed(1)}%`
-                }
+                label={renderLabel}
                 outerRadius={100}
-                fill="#8884d8"
                 dataKey="value"
               >
                 {chartData.map((entry, index) => (
@@ -276,7 +168,31 @@ function Profile() {
                   />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip
+                formatter={(value) => `${value} units`}
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const val = payload[0].value;
+                    const name = payload[0].name;
+                    const percent = ((val / totalReceived) * 100).toFixed(1);
+                    return (
+                      <div
+                        style={{
+                          backgroundColor: "#fff",
+                          border: "1px solid #ccc",
+                          padding: 10,
+                        }}
+                      >
+                        <p>{name}</p>
+                        <p>
+                          {val} units ({percent}%)
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
               <Legend verticalAlign="bottom" height={36} />
             </PieChart>
           </ResponsiveContainer>
