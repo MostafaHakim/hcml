@@ -15,20 +15,10 @@ router.post("/", async (req, res) => {
     });
 
     const text = await response.text();
-    let parsed;
-
-    try {
-      parsed = JSON.parse(text);
-    } catch (err) {
-      return res
-        .status(500)
-        .send("❌ Invalid JSON response from Google Apps Script");
-    }
-
-    res.json(parsed);
+    res.send(text);
   } catch (err) {
-    console.error("Proxy error:", err);
-    res.status(500).send("❌ Error forwarding to Google Apps Script");
+    console.error(err);
+    res.status(500).send("Error forwarding to Google Apps Script");
   }
 });
 
