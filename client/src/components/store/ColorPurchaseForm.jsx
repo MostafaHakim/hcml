@@ -298,7 +298,7 @@ const ColorPurchaseForm = () => {
         setColorMap({});
       });
   }, []);
-
+  console.log(colorMap);
   // Fetch vendor list
   useEffect(() => {
     fetch("https://hcml-ry8s.vercel.app/vendor")
