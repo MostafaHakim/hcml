@@ -64,7 +64,7 @@ function Stock() {
       <main className="w-full">
         <div>
           <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
-            Required Purchase (Color Stock is Below 4 KG)
+            Required to Purchase (Color Stock is Below 4 KG)
           </h2>
         </div>
         {Object.entries(groupedByCategory).map(([category, items]) => {
@@ -73,6 +73,9 @@ function Stock() {
               key={category}
               className="mb-10 w-full text-left uppercase"
             >
+              <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
+                {category} ({items.length})
+              </h2>
               <div className="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1 text-sm text-left capitalize">
                 {items.map((color) =>
                   color["PRESENT STOCK"] < 4000 ? (
@@ -102,6 +105,11 @@ function Stock() {
           );
         })}
         {/* ক্যাটাগরি অনুযায়ী গ্রুপে দেখানো */}
+        <div>
+          <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
+            Present Stock
+          </h2>
+        </div>
         {Object.entries(groupedByCategory).map(([category, items]) => (
           <section key={category} className="mb-10 w-full text-left uppercase">
             <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
