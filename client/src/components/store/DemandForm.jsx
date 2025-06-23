@@ -83,8 +83,8 @@ const DyesDemandForm = () => {
     const totalCost = data.colors.reduce((sum, item) => {
       return sum + parseFloat(item.gram || 0) * parseFloat(item.price || 0);
     }, 0);
-
-    const costPerGaj = totalCost / parseFloat(data.qty || 1);
+    const countGoj = parseFloat(data.qty) - (parseFloat(data.qty) * 10) / 100;
+    const costPerGaj = totalCost / countGoj;
 
     const payload = {
       ...data,

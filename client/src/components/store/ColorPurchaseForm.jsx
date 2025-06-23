@@ -24,11 +24,19 @@ const ColorPurchaseForm = () => {
       .catch((err) => console.error("Failed to fetch colors:", err));
   }, []);
 
-  // Fetch vendor list
+  // Fetch vendor list and update vendorList state properly
   useEffect(() => {
     fetch("https://hcml-ry8s.vercel.app/vendor")
       .then((res) => res.json())
-      .then(setVendorList)
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 1) {
+          const rows = data.slice(1);
+          const vendor = rows.map((item) => item[0]);
+          setVendorList(vendor);
+        } else {
+          setVendorList([]);
+        }
+      })
       .catch((err) => console.error("Failed to fetch vendors:", err));
   }, []);
   console.log(vendorList);
@@ -36,10 +44,11 @@ const ColorPurchaseForm = () => {
     const { name, value } = e.target;
 
     if (name === "colorName") {
+      const category = value ? colorMap[value] || "" : "";
       setFormData((prev) => ({
         ...prev,
         colorName: value,
-        category: colorMap[value] || "",
+        category,
       }));
     } else {
       setFormData((prev) => ({
@@ -56,13 +65,15 @@ const ColorPurchaseForm = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           colorName: formData.colorName,
-          qty: formData.qtyKg * 1000,
+          qty: Number(formData.qtyKg) * 1000,
         }),
       });
       const result = await res.text();
+      return result;
     } catch (err) {
       console.error("Stock update failed:", err);
       setMessage("Stock update failed!");
+      return null;
     }
   };
 
@@ -82,20 +93,22 @@ const ColorPurchaseForm = () => {
 
       if (result.success) {
         setMessage("Updating Stock...");
-        await updateStock();
-        setMessage("✅ Stock updated successfully...");
-        setTimeout(() => {
-          setFormData({
-            date: "",
-            colorName: "",
-            category: "",
-            vendor: "",
-            memo: "",
-            qtyKg: "",
-            pricePerKg: "",
-          });
-          setMessage("");
-        }, 3000);
+        const stockResult = await updateStock();
+        if (stockResult !== null) {
+          setMessage("✅ Stock updated successfully...");
+          setTimeout(() => {
+            setFormData({
+              date: "",
+              colorName: "",
+              category: "",
+              vendor: "",
+              memo: "",
+              qtyKg: "",
+              pricePerKg: "",
+            });
+            setMessage("");
+          }, 3000);
+        }
       } else {
         setMessage("❌ Failed to submit purchase");
       }
@@ -209,8 +222,9 @@ const ColorPurchaseForm = () => {
 
         {message && (
           <p
-            className="text-center mt-4 font-semibold text-lg animate-pulse"
-            style={{ color: message.includes("✅") ? "green" : "red" }}
+            className={`text-center mt-4 font-semibold text-lg ${
+              message.includes("✅") ? "text-green-600" : "text-red-600"
+            } animate-pulse`}
           >
             {message}
           </p>
