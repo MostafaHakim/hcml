@@ -62,6 +62,45 @@ function Stock() {
   return (
     <div className="w-full flex flex-col items-center justify-center px-4 pb-8">
       <main className="w-full">
+        <div>
+          <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2">
+            Required Purchase (Color Stock is Below 4 KG)
+          </h2>
+        </div>
+        {Object.entries(groupedByCategory).map(([category, items]) => {
+          return (
+            <section
+              key={category}
+              className="mb-10 w-full text-left uppercase"
+            >
+              <div className="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1 text-sm text-left capitalize">
+                {items.map((color) =>
+                  color["PRESENT STOCK"] < 4000 ? (
+                    <div
+                      key={color["PRODUCT NAME"]}
+                      className="p-3 bg-white border border-gray-200 text-black flex flex-col items-start rounded-md shadow hover:bg-gray-50 transition"
+                    >
+                      <label className="font-semibold">
+                        {color["PRODUCT NAME"]}
+                      </label>
+                      <p className="text-green-600">
+                        Current Stock: <span>{color["PRESENT STOCK"]}</span>
+                      </p>
+                      <p className="text-yellow-600">
+                        Stock On Hold: <span>{color["ON HOLD"]}</span>
+                      </p>
+                      <p className="text-gray-600">
+                        Total Stock: <span>{color["TOTAL STOCK"]}</span>
+                      </p>
+                    </div>
+                  ) : (
+                    ""
+                  )
+                )}
+              </div>
+            </section>
+          );
+        })}
         {/* ক্যাটাগরি অনুযায়ী গ্রুপে দেখানো */}
         {Object.entries(groupedByCategory).map(([category, items]) => (
           <section key={category} className="mb-10 w-full text-left uppercase">
