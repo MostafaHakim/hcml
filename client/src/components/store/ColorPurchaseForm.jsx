@@ -31,7 +31,7 @@ const ColorPurchaseForm = () => {
       .then(setVendorList)
       .catch((err) => console.error("Failed to fetch vendors:", err));
   }, []);
-
+  console.log(vendorList);
   const handleChange = (e) => {
     const { name, value } = e.target;
 
