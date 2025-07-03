@@ -16,13 +16,13 @@ function Delivery() {
   });
   const [challanNo, setChallanNo] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         const [partyRes, challanRes] = await Promise.all([
-          fetch(`${baseUrl}/party`),
-          fetch(`${baseUrl}/lastchallan`),
+          fetch(`${BASE_URL}/griegein/party`),
+          fetch(`${BASE_URL}/griegein/lastchallan`),
         ]);
         const partyData = await partyRes.json();
         setParties(partyData);
@@ -41,7 +41,11 @@ function Delivery() {
       setAddress("");
       return;
     }
-    fetch(`${baseUrl}/getaddress?party=${encodeURIComponent(selectedParty)}`)
+    fetch(
+      `${BASE_URL}/griegein/getaddress?party=${encodeURIComponent(
+        selectedParty
+      )}`
+    )
       .then((res) => res.json())
       .then((data) => setAddress(data?.address || ""))
       .catch(() => setAddress(""));
@@ -52,7 +56,7 @@ function Delivery() {
     setTables([]);
     try {
       const lotRes = await fetch(
-        `${baseUrl}/getlots?party=${encodeURIComponent(party)}`
+        `${BASE_URL}/griegein/getlots?party=${encodeURIComponent(party)}`
       );
       const lotData = await lotRes.json();
       setLots(lotData);
@@ -76,8 +80,8 @@ function Delivery() {
   const handleLotChange = async (lot, index) => {
     try {
       const [infoRes, colorRes] = await Promise.all([
-        fetch(`${baseUrl}/getlotinfo?lot=${encodeURIComponent(lot)}`),
-        fetch(`${baseUrl}/colorres?lot=${encodeURIComponent(lot)}`),
+        fetch(`${BASE_URL}/griegein/getlotinfo?lot=${encodeURIComponent(lot)}`),
+        fetch(`${BASE_URL}/griegein/colorres?lot=${encodeURIComponent(lot)}`),
       ]);
       const lotInfo = await infoRes.json();
       const colorData = await colorRes.json();
@@ -104,7 +108,9 @@ function Delivery() {
     try {
       const lot = tables[index].lot;
       const detailRes = await fetch(
-        `${baseUrl}/detailsres?lot=${lot}&color=${encodeURIComponent(color)}`
+        `${BASE_URL}/griegein/detailsres?lot=${lot}&color=${encodeURIComponent(
+          color
+        )}`
       );
       const detailData = await detailRes.json();
       const validRows = detailData.rows.filter(
@@ -163,7 +169,7 @@ function Delivery() {
 
   const DeliveryUpdate = async () => {
     try {
-      await fetch(`${baseUrl}/delivarydata`, {
+      await fetch(`${BASE_URL}/griegein/delivarydata`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -182,7 +188,7 @@ function Delivery() {
     try {
       for (const table of tables) {
         if (table.lot && table.color && table.rows.length > 0) {
-          const res = await fetch(`${baseUrl}/griegeupdate`, {
+          const res = await fetch(`${BASE_URL}/griegein/griegeupdate`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ lot: table.lot, color: table.color }),

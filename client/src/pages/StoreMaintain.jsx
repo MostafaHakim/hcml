@@ -8,17 +8,20 @@ function StoreMaintain() {
   const [memoSearch, setMemoSearch] = useState("");
   const [dateSearch, setDateSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loadingBatchIndex, setLoadingBatchIndex] = useState(null); // ✅ Loading state for button
+
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
     setLoading(true);
-    fetch(`https://hcml-ry8s.vercel.app/demand/verifydyes`)
+    fetch(`${BASE_URL}/demand/verifydyes`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch data");
         return res.json();
       })
       .then((data) => {
         setData(data);
-        filterByDateAndMemo(data); // Filter immediately after data loads
+        filterByDateAndMemo(data);
       })
       .catch((error) => {
         console.error("Fetch error:", error);
@@ -30,7 +33,6 @@ function StoreMaintain() {
   }, []);
 
   useEffect(() => {
-    // Re-filter when search terms change
     filterByDateAndMemo(data);
   }, [memoSearch, dateSearch, data]);
 
@@ -88,7 +90,7 @@ function StoreMaintain() {
     }));
 
     try {
-      const response = await fetch("https://hcml-ry8s.vercel.app/stock/hold", {
+      const response = await fetch(`${BASE_URL}/stock/hold`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ batchData: payload }),
@@ -103,27 +105,24 @@ function StoreMaintain() {
     }
   };
 
-  const markDelivered = async (batch) => {
+  const markDelivered = async (batch, index) => {
+    setLoadingBatchIndex(index); // ✅ Start loading this batch
     try {
       const memoNo = batch[0][1];
       const date = formatDate(batch[0][0]);
       const payload = { memoNo, date, status: "Delivered" };
 
-      const response = await fetch(
-        "https://hcml-ry8s.vercel.app/demand/status",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/demand/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok)
         throw new Error("Failed to update status in Google Sheet");
 
       await holdUpdate(batch);
 
-      // Update the status in the local state
       const updatedData = data.map((row) => {
         if (batch.includes(row)) {
           const newRow = [...row];
@@ -140,10 +139,11 @@ function StoreMaintain() {
     } catch (error) {
       console.error("Status update error:", error);
       alert("Failed to mark batch as delivered. Please try again.");
+    } finally {
+      setLoadingBatchIndex(null); // ✅ Clear loading state
     }
   };
 
-  // Prepare batches for rendering
   const prepareBatches = (data) => {
     if (!data.length) return [];
 
@@ -202,6 +202,7 @@ function StoreMaintain() {
               </button>
             </div>
           </div>
+
           {loading ? (
             <div className="text-center text-white mt-8 text-2xl">
               Loading batches...
@@ -241,15 +242,22 @@ function StoreMaintain() {
                     </tbody>
                   </table>
                   <button
-                    onClick={() => markDelivered(batch)}
-                    disabled={batch[0][18] === "Delivered"}
+                    onClick={() => markDelivered(batch, batchIndex)}
+                    disabled={
+                      batch[0][18] === "Delivered" ||
+                      loadingBatchIndex === batchIndex
+                    }
                     className={`text-white px-4 py-1 rounded ${
                       batch[0][18] === "Delivered"
                         ? "bg-gray-400 cursor-not-allowed"
+                        : loadingBatchIndex === batchIndex
+                        ? "bg-yellow-500 cursor-wait"
                         : "bg-green-600 hover:bg-green-700"
                     }`}
                   >
-                    Mark as Delivered
+                    {loadingBatchIndex === batchIndex
+                      ? "Processing..."
+                      : "Mark as Delivered"}
                   </button>
                 </div>
               ))}

@@ -9,8 +9,10 @@ function Costing() {
   const [partySearch, setPartySearch] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
+
   useEffect(() => {
-    fetch(`https://hcml-ry8s.vercel.app/demand/verifydyes`)
+    fetch(`${BASE_URL}/demand/verifydyes`)
       .then((res) => res.json())
       .then((data) => {
         setData(data);
@@ -76,7 +78,7 @@ function Costing() {
     const fakeRowsPerBatch = 4;
 
     return (
-      <div className="min-w-full border border-gray-300 rounded-lg shadow mx-auto max-w-7xl animate-pulse">
+      <div className=" border border-gray-300 rounded-lg shadow mx-auto w-full animate-pulse">
         <table className="min-w-full text-left">
           <thead className="bg-blue-100">
             <tr>
@@ -141,9 +143,9 @@ function Costing() {
   if (currentBatch.length > 0) batchRows.push(currentBatch);
 
   return (
-    <div className="overflow-x-auto p-4 text-sm">
+    <div className="p-4 text-sm  mx-auto">
       {/* Filter Inputs */}
-      <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
         <div>
           <label className="block text-xs font-semibold mb-1">From Date</label>
           <input
@@ -184,23 +186,25 @@ function Costing() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto mb-6">
+      {/* Filter Button */}
+      <div className="max-w-6xl mx-auto mb-6 text-right">
         <button
           onClick={handleFilter}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded shadow"
         >
-          Filter
+          Apply Filter
         </button>
       </div>
 
-      <div className="min-w-full border border-gray-300 rounded-lg shadow mx-auto max-w-7xl">
+      {/* Table */}
+      <div className="overflow-auto border border-gray-300 rounded-lg shadow w-full mx-auto h-screen">
         <table className="min-w-full text-left text-black">
           <thead className="bg-blue-100 sticky top-0 z-10">
             <tr>
               {headers.map((header, index) => (
                 <th
                   key={index}
-                  className="py-1 px-3 border font-semibold text-center"
+                  className="py-2 px-3 border font-semibold text-center whitespace-nowrap"
                 >
                   {header}
                 </th>

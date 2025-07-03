@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -14,7 +13,6 @@ function Profile() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // State for party details, demand, grouped delivery data, and loading states
   const [party, setParty] = useState(null);
   const [demand, setDemand] = useState([]);
   const [groupedData, setGroupedData] = useState([]);
@@ -23,13 +21,19 @@ function Profile() {
   const [loadingDemand, setLoadingDemand] = useState(true);
   const [loadingDelivery, setLoadingDelivery] = useState(true);
 
+  const [lotFilter, setLotFilter] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
+
   // Fetch party details
   useEffect(() => {
     setLoadingParty(true);
-    fetch(`https://hcml-ry8s.vercel.app/party/partydetails`)
+    fetch(`${BASE_URL}/party/partydetails`)
       .then((res) => res.json())
       .then((data) => {
-        const rows = data.slice(1); // skip header row
+        const rows = data.slice(1);
         const found = rows.find((p) => String(p[2]) === id);
         setParty(found || null);
       })
@@ -37,20 +41,20 @@ function Profile() {
       .finally(() => setLoadingParty(false));
   }, [id]);
 
-  // Fetch demand (Greige Received)
+  // Fetch demand
   useEffect(() => {
     setLoadingDemand(true);
-    fetch(`https://hcml-ry8s.vercel.app/demand`)
+    fetch(`${BASE_URL}/demand`)
       .then((res) => res.json())
       .then((data) => setDemand(data))
       .catch(() => setDemand([]))
       .finally(() => setLoadingDemand(false));
   }, []);
 
-  // Fetch delivery data and group by Chalan No + Lot Number
+  // Fetch delivery
   useEffect(() => {
     setLoadingDelivery(true);
-    fetch(`https://hcml-ry8s.vercel.app/griegein/delivaryinfo`)
+    fetch(`${BASE_URL}/griegein/delivaryinfo`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 1) {
@@ -99,20 +103,36 @@ function Profile() {
       .finally(() => setLoadingDelivery(false));
   }, []);
 
-  // Memoize filtered data to avoid unnecessary recalculations
   const partyName = party ? party[0] : "";
+
+  const isWithinDateRange = (dateStr) => {
+    if (!fromDate && !toDate) return true;
+    const date = new Date(dateStr);
+    if (fromDate && date < new Date(fromDate)) return false;
+    if (toDate && date > new Date(toDate)) return false;
+    return true;
+  };
 
   const filteredDemand = useMemo(() => {
     if (!partyName) return [];
-    return demand.filter((item) => item["Party's Name"] === partyName);
-  }, [demand, partyName]);
+    return demand.filter(
+      (item) =>
+        item["Party's Name"] === partyName &&
+        (!lotFilter || String(item["Lot Number"] || "").includes(lotFilter)) &&
+        isWithinDateRange(item.Date)
+    );
+  }, [demand, partyName, lotFilter, fromDate, toDate]);
 
   const filteredDelivery = useMemo(() => {
     if (!partyName) return [];
-    return groupedData.filter((item) => item["Party's Name"] === partyName);
-  }, [groupedData, partyName]);
+    return groupedData.filter(
+      (item) =>
+        item["Party's Name"] === partyName &&
+        (!lotFilter || String(item["Lot Number"] || "").includes(lotFilter)) &&
+        isWithinDateRange(item.Date)
+    );
+  }, [groupedData, partyName, lotFilter, fromDate, toDate]);
 
-  // Calculate totals
   const totalReceived = filteredDemand.reduce(
     (sum, item) => sum + (parseFloat(item["Received Grey"]) || 0),
     0
@@ -123,21 +143,14 @@ function Profile() {
   );
   const totalPending = Math.max(totalReceived - totalDelivered, 0);
 
-  // Prepare pie chart data
   const chartData = [
     { name: "Delivered", value: totalDelivered },
     { name: "Pending", value: totalPending },
   ];
   const COLORS = ["#00C49F", "#FF8042"];
 
-  // Pie label formatter
-  const renderLabel = ({ name, value }) => {
-    if (totalReceived === 0) return `${name}: 0%`;
-    const percent = (value / totalReceived) * 100;
-    return `${name}: ${percent.toFixed(1)}%`;
-  };
+  const renderLabel = ({ name, value }) => `${name}: ${value} YDS`;
 
-  // Loading or error UI
   if (loadingParty) {
     return (
       <div className="p-6 text-center text-gray-600">
@@ -145,6 +158,7 @@ function Profile() {
       </div>
     );
   }
+
   if (!party) {
     return (
       <div className="p-6 text-center text-red-600">
@@ -161,24 +175,58 @@ function Profile() {
 
   return (
     <div className="p-6 w-full max-w-6xl mx-auto bg-white rounded-lg shadow-md space-y-8">
-      {/* Back button */}
       <div className="flex justify-start">
         <button
           onClick={() => navigate(-1)}
           className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-          aria-label="Go back"
         >
           ← Back
         </button>
       </div>
 
-      {/* Party Name */}
       <h2 className="text-2xl font-bold mb-4 text-center text-blue-800">
         {partyName}
       </h2>
 
+      {/* Filter Section */}
+      <div className="bg-gray-50 p-4 rounded shadow-md space-y-4">
+        <h3 className="text-lg font-semibold text-gray-700">🔎 Filter Data</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <input
+            type="text"
+            placeholder="Search by Lot Number"
+            value={lotFilter}
+            onChange={(e) => setLotFilter(e.target.value)}
+            className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <input
+            type="date"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <input
+            type="date"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+            className="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
+        <div className="text-right">
+          <button
+            onClick={() => {
+              setLotFilter("");
+              setFromDate("");
+              setToDate("");
+            }}
+            className="text-sm text-red-600 hover:underline"
+          >
+            Reset Filters
+          </button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-        {/* Party Info */}
         <div className="text-gray-700 text-md flex flex-col space-y-2">
           <p>
             <span className="font-semibold">Address:</span> {party[1]}
@@ -188,10 +236,9 @@ function Profile() {
           </p>
         </div>
 
-        {/* Pie Chart */}
         <div className="bg-gray-50 p-4 rounded shadow-md">
-          <h3 className="text-lg font-semibold mb-4 text-center text-purple-700">
-            Greige Summary (Pie Chart)
+          <h3 className="text-lg font-semibold mb-2 text-center text-purple-700">
+            Greige Summary (Yards)
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -211,38 +258,18 @@ function Profile() {
                   />
                 ))}
               </Pie>
-              <Tooltip
-                formatter={(value) => `${value} units`}
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    const val = payload[0].value;
-                    const name = payload[0].name;
-                    const percent = ((val / totalReceived) * 100).toFixed(1);
-                    return (
-                      <div
-                        style={{
-                          backgroundColor: "#fff",
-                          border: "1px solid #ccc",
-                          padding: 10,
-                        }}
-                      >
-                        <p>{name}</p>
-                        <p>
-                          {val} units ({percent}%)
-                        </p>
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-              />
+              <Tooltip formatter={(value) => `${value} YDS`} />
               <Legend verticalAlign="bottom" height={36} />
             </PieChart>
           </ResponsiveContainer>
+          <div className="mt-1 text-center text-blue-800 text-md font-medium">
+            Total Received:{" "}
+            <span className="font-bold">{totalReceived} YDS</span>
+          </div>
         </div>
       </div>
 
-      {/* Greige Received */}
+      {/* Greige Received Table */}
       <div>
         <h3 className="text-lg font-semibold text-green-700 border-b mb-2">
           Greige Received
@@ -295,7 +322,7 @@ function Profile() {
         )}
       </div>
 
-      {/* Greige Delivered */}
+      {/* Greige Delivered Table */}
       <div>
         <h3 className="text-lg font-semibold text-blue-700 border-b mb-2">
           Greige Delivered

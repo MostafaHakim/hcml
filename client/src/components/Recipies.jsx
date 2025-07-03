@@ -33,10 +33,10 @@ function Recipes({ searchColor, weight }) {
   const [rawData, setRawData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   useEffect(() => {
     setLoading(true);
-    fetch("https://hcml-ry8s.vercel.app/demand/recipies")
+    fetch(`${BASE_URL}/demand/recipies`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(

@@ -16,7 +16,7 @@ const DyesDemandForm = () => {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
   const [message, setMessage] = useState("");
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const {
     register,
     handleSubmit,
@@ -56,7 +56,7 @@ const DyesDemandForm = () => {
   const stockUpdate = async () => {
     setMessage("Submitting...");
     try {
-      const res = await fetch("https://hcml-ry8s.vercel.app/stock", {
+      const res = await fetch(`${BASE_URL}/stock`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ colors: watchValues.colors }),
@@ -95,7 +95,7 @@ const DyesDemandForm = () => {
     await stockUpdate();
 
     try {
-      const res = await fetch("https://hcml-ry8s.vercel.app/demand", {
+      const res = await fetch(`${BASE_URL}/demand`, {
         method: "POST",
         body: JSON.stringify(payload),
         headers: { "Content-Type": "application/json" },

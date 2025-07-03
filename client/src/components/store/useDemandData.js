@@ -5,24 +5,24 @@ const useDemandData = () => {
   const [verifyDyes, setVerifyDyes] = useState([]);
   const [machine, setMachine] = useState([]);
   const [master, setMaster] = useState([]);
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   useEffect(() => {
-    fetch(`https://hcml-ry8s.vercel.app/demand`)
+    fetch(`${BASE_URL}/demand`)
       .then((res) => res.json())
       .then(setDemandData);
 
-    fetch(`https://hcml-ry8s.vercel.app/demand/verifydyes`)
+    fetch(`${BASE_URL}/demand/verifydyes`)
       .then((res) => res.json())
       .then(setVerifyDyes);
 
-    fetch(`https://hcml-ry8s.vercel.app/party/alldata`)
+    fetch(`${BASE_URL}/party/alldata`)
       .then((res) => res.json())
       .then((data) => {
         // Remove header and map only machine names (first column)
         const onlyMachineNames = data.slice(1).map((row) => row[0]);
         setMachine(onlyMachineNames);
       });
-    fetch(`https://hcml-ry8s.vercel.app/user/master`)
+    fetch(`${BASE_URL}/user/master`)
       .then((res) => res.json())
       .then((data) => {
         // Remove header and map only machine names (first column)

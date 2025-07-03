@@ -5,243 +5,237 @@ const ColorPurchaseForm = () => {
   const [vendorList, setVendorList] = useState([]);
   const [formData, setFormData] = useState({
     date: "",
-    colorName: "",
-    category: "",
     vendor: "",
     memo: "",
-    qtyKg: "",
-    pricePerKg: "",
   });
-
+  const [formDataList, setFormDataList] = useState([
+    { colorName: "", category: "", qtyKg: "", pricePerKg: "" },
+  ]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Fetch color map
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
+
   useEffect(() => {
-    fetch("https://hcml-ry8s.vercel.app/color")
+    fetch(`${BASE_URL}/color`)
       .then((res) => res.json())
       .then((data) => {
+        const mapped = {};
         if (Array.isArray(data) && data.length > 1) {
-          const rows = data.slice(1); // remove headers
-          const mapped = {};
-          rows.forEach(([color, category]) => {
+          data.slice(1).forEach(([color, category]) => {
             mapped[color] = category;
           });
-          setColorMap(mapped);
-        } else {
-          setColorMap({});
         }
+        setColorMap(mapped);
       })
-      .catch((err) => {
-        console.error("Failed to fetch colors:", err);
-        setColorMap({});
-      });
+      .catch(() => setColorMap({}));
   }, []);
 
-  // Fetch vendor list
   useEffect(() => {
-    fetch("https://hcml-ry8s.vercel.app/vendor")
+    fetch(`${BASE_URL}/vendor`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 1) {
-          const rows = data.slice(1);
-          const vendors = rows.map((item) => item[0]);
-          setVendorList(vendors);
-        } else {
-          setVendorList([]);
+          setVendorList(data.slice(1).map((item) => item[0]));
         }
-      })
-      .catch((err) => {
-        console.error("Failed to fetch vendors:", err);
-        setVendorList([]);
       });
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "colorName") {
-      const category = colorMap[value] || "";
-      setFormData((prev) => ({ ...prev, colorName: value, category }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+  const handleMainChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const updateStock = async () => {
-    try {
-      const res = await fetch("https://hcml-ry8s.vercel.app/stock/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          colorName: formData.colorName,
-          qty: Number(formData.qtyKg) * 1000,
-        }),
-      });
+  const handleRowChange = (e, index) => {
+    const { name, value } = e.target;
+    const updated = [...formDataList];
+    updated[index][name] = value;
 
-      const result = await res.text();
-      return result;
-    } catch (err) {
-      console.error("Stock update failed:", err);
-      return null;
+    if (name === "colorName") {
+      updated[index].category = colorMap[value] || "";
     }
+
+    setFormDataList(updated);
+  };
+
+  const addRow = () => {
+    setFormDataList([
+      ...formDataList,
+      { colorName: "", category: "", qtyKg: "", pricePerKg: "" },
+    ]);
+  };
+
+  const removeRow = () => {
+    const updated = [...formDataList];
+    updated.pop();
+    setFormDataList(updated);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("Submitting purchase...");
+    setMessage("Submitting...");
 
     try {
-      const res = await fetch("https://hcml-ry8s.vercel.app/proxy", {
+      // Save purchase
+      const res = await fetch(`${BASE_URL}/color`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, items: formDataList }),
       });
 
       const result = await res.json();
 
       if (result.success) {
-        setMessage("Updating stock...");
-        const stockResult = await updateStock();
-        if (stockResult !== null) {
+        // Update stock
+        const stockRes = await fetch(`${BASE_URL}/stock/add`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(
+            formDataList.map((item) => ({
+              colorName: item.colorName,
+              qty: parseFloat(item.qtyKg) * 1000,
+            }))
+          ),
+        });
+
+        const stockResult = await stockRes.json();
+
+        if (stockResult.status === "success") {
           setMessage("✅ Purchase & stock updated successfully!");
-          setFormData({
-            date: "",
-            colorName: "",
-            category: "",
-            vendor: "",
-            memo: "",
-            qtyKg: "",
-            pricePerKg: "",
-          });
+          setFormData({ date: "", vendor: "", memo: "" });
+          setFormDataList([
+            { colorName: "", category: "", qtyKg: "", pricePerKg: "" },
+          ]);
         } else {
-          setMessage("⚠️ Purchase added but stock update failed.");
+          setMessage("⚠️ Purchase saved but stock update failed.");
         }
       } else {
-        setMessage(`❌ Failed: ${result.error || "Unknown error"}`);
+        setMessage("❌ Failed to save purchase.");
       }
     } catch (err) {
-      console.error("Submit error:", err);
-      setMessage("❌ Network error. Submission failed.");
+      setMessage("❌ Network error.");
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-8 bg-white shadow-2xl rounded-2xl border border-gray-100">
-      <h2 className="text-3xl font-bold text-blue-700 mb-6 text-center">
+    <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-xl">
+      <h2 className="text-2xl font-bold text-center text-blue-700 mb-4">
         🎨 Color Purchase Entry
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6 text-black">
-        {/* Date & Color Name */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField
             label="Date"
-            type="date"
             name="date"
+            type="date"
             value={formData.date}
-            onChange={handleChange}
+            onChange={handleMainChange}
             required
           />
           <div>
-            <FormLabel name="Color Name" required />
-            <input
-              type="text"
-              name="colorName"
-              list="colorNameOptions"
-              value={formData.colorName}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 border rounded-xl"
-            />
-            {Object.keys(colorMap).length === 0 ? (
-              <p className="text-sm text-gray-500">Loading colors...</p>
-            ) : (
-              <datalist id="colorNameOptions">
-                {Object.keys(colorMap).map((color, index) => (
-                  <option key={index} value={color} />
-                ))}
-              </datalist>
-            )}
-          </div>
-        </div>
-
-        {/* Category & Vendor */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            label="Category"
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            readOnly
-            bgGray
-          />
-          <div>
-            <FormLabel name="Vendor" />
+            <FormLabel name="Vendor" required />
             <select
               name="vendor"
               value={formData.vendor}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-xl"
+              onChange={handleMainChange}
+              className="w-full px-3 py-2 border rounded-lg"
             >
               <option value="">Select Vendor</option>
-              {vendorList.map((vendor, index) => (
-                <option key={index} value={vendor}>
+              {vendorList.map((vendor, i) => (
+                <option key={i} value={vendor}>
                   {vendor}
                 </option>
               ))}
             </select>
           </div>
-        </div>
-
-        {/* Memo */}
-        <FormField
-          label="Memo"
-          name="memo"
-          value={formData.memo}
-          onChange={handleChange}
-        />
-
-        {/* Quantity & Price */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
-            label="Quantity (KG)"
-            type="number"
-            name="qtyKg"
-            value={formData.qtyKg}
-            onChange={handleChange}
-            required
-          />
-          <FormField
-            label="Price per KG"
-            type="number"
-            name="pricePerKg"
-            value={formData.pricePerKg}
-            onChange={handleChange}
-            required
+            label="Memo"
+            name="memo"
+            value={formData.memo}
+            onChange={handleMainChange}
           />
         </div>
+
+        <div className="flex justify-between items-center">
+          <h3 className="font-semibold text-lg">Colors</h3>
+          <div>
+            <button
+              type="button"
+              onClick={addRow}
+              className="text-blue-600 font-semibold mr-2"
+            >
+              + Add Row
+            </button>
+            {formDataList.length > 1 && (
+              <button
+                type="button"
+                onClick={removeRow}
+                className="text-red-600 font-semibold"
+              >
+                - Remove
+              </button>
+            )}
+          </div>
+        </div>
+
+        {formDataList.map((item, index) => (
+          <div
+            key={index}
+            className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg border mb-2"
+          >
+            <FormField
+              label="Color Name"
+              name="colorName"
+              value={item.colorName}
+              onChange={(e) => handleRowChange(e, index)}
+              list="colorNameOptions"
+              required
+            />
+            <FormField
+              label="Category"
+              name="category"
+              value={item.category}
+              readOnly
+              bgGray
+            />
+            <FormField
+              label="Qty (KG)"
+              name="qtyKg"
+              type="number"
+              value={item.qtyKg}
+              onChange={(e) => handleRowChange(e, index)}
+              required
+            />
+            <FormField
+              label="Price/KG"
+              name="pricePerKg"
+              type="number"
+              value={item.pricePerKg}
+              onChange={(e) => handleRowChange(e, index)}
+              required
+            />
+          </div>
+        ))}
+
+        <datalist id="colorNameOptions">
+          {Object.keys(colorMap).map((color, index) => (
+            <option key={index} value={color} />
+          ))}
+        </datalist>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 font-semibold"
+          className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700"
         >
           {loading ? "Submitting..." : "Submit"}
         </button>
 
         {message && (
-          <p
-            className={`text-center mt-4 font-semibold text-lg ${
-              message.includes("✅")
-                ? "text-green-600"
-                : message.includes("⚠️")
-                ? "text-yellow-500"
-                : "text-red-600"
-            } animate-pulse`}
-          >
+          <p className="text-center font-semibold mt-4 animate-pulse">
             {message}
           </p>
         )}
@@ -250,15 +244,15 @@ const ColorPurchaseForm = () => {
   );
 };
 
-// 🔁 Reusable Field Components
 const FormField = ({
   label,
-  type = "text",
   name,
   value,
   onChange,
+  type = "text",
   required = false,
   readOnly = false,
+  list = "",
   bgGray = false,
 }) => (
   <div>
@@ -270,7 +264,8 @@ const FormField = ({
       onChange={onChange}
       required={required}
       readOnly={readOnly}
-      className={`w-full px-4 py-2 border rounded-xl ${
+      list={list}
+      className={`w-full px-3 py-2 border rounded-lg ${
         bgGray ? "bg-gray-100" : ""
       }`}
     />
@@ -278,7 +273,7 @@ const FormField = ({
 );
 
 const FormLabel = ({ name, required = false }) => (
-  <label className="block text-sm font-medium text-gray-600 mb-1">
+  <label className="block text-sm text-gray-700 font-medium mb-1">
     {name} {required && <span className="text-red-500">*</span>}
   </label>
 );

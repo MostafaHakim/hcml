@@ -7,11 +7,11 @@ function Dyes() {
   const [colorStock, setColorStock] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const location = useLocation();
   const showLocation = location.pathname == "/admin/store/dyes";
   useEffect(() => {
-    fetch(`https://hcml-ry8s.vercel.app/stock`)
+    fetch(`${BASE_URL}/stock`)
       .then((res) => res.json())
       .then((data) => {
         setColorStock(data);

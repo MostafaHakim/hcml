@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 
 const useColorPrice = () => {
   const [colorPrice, setColorPrice] = useState({});
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   useEffect(() => {
-    fetch(`https://hcml-ry8s.vercel.app/colorprice`)
+    fetch(`${BASE_URL}/colorprice`)
       .then((res) => res.json())
       .then(setColorPrice);
   }, [colorPrice]);

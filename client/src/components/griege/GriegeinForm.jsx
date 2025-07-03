@@ -7,7 +7,7 @@ export default function LotEntryForm() {
   const [thans, setThans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false); // ✅ added
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const [form, setForm] = useState({
     lotNo: "",
     date: "",
@@ -24,10 +24,10 @@ export default function LotEntryForm() {
     const fetchAll = async () => {
       try {
         const [lotRes, partyAllRes, partyRes, masterRes] = await Promise.all([
-          fetch("https://hcml-ry8s.vercel.app/griegein"),
-          fetch("https://hcml-ry8s.vercel.app/party/alldata"),
-          fetch("https://hcml-ry8s.vercel.app/party"),
-          fetch("https://hcml-ry8s.vercel.app/user/master"),
+          fetch(`${BASE_URL}/griegein`),
+          fetch(`${BASE_URL}/party/alldata`),
+          fetch(`${BASE_URL}/party`),
+          fetch(`${BASE_URL}/user/master`),
         ]);
 
         const lotData = await lotRes.json();
@@ -105,7 +105,7 @@ export default function LotEntryForm() {
     };
 
     try {
-      const response = await fetch("https://hcml-ry8s.vercel.app/griegein", {
+      const response = await fetch(`${BASE_URL}/griegein`, {
         method: "POST",
         body: JSON.stringify(fullPayload),
         headers: {
@@ -117,7 +117,7 @@ export default function LotEntryForm() {
       if (result.result === "success") {
         alert("Data saved successfully!");
 
-        const res = await fetch("https://hcml-ry8s.vercel.app/griegein");
+        const res = await fetch(`${BASE_URL}/griegein`);
         const data = await res.json();
         const nextLot = parseInt(data) + 1;
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   PieChart,
   Pie,
@@ -9,14 +9,12 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// Pie Chart Component
 function MasterProfileChart({ delivered, remaining }) {
   const data = [
     { name: `Delivered (${delivered} yds)`, value: delivered },
     { name: `Remaining (${remaining} yds)`, value: remaining },
   ];
-
-  const COLORS = ["#0088FE", "#FF8042"]; // Blue = Delivered, Orange = Remaining
+  const COLORS = ["#0088FE", "#FF8042"];
 
   return (
     <div style={{ width: "100%", height: 300 }}>
@@ -33,13 +31,9 @@ function MasterProfileChart({ delivered, remaining }) {
               `${name} (${(percent * 100).toFixed(0)}%)`
             }
             labelLine={false}
-            fill="#8884d8"
           >
             {data.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
+              <Cell key={index} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
           <Tooltip formatter={(value, name) => [`${value} yds`, name]} />
@@ -50,265 +44,361 @@ function MasterProfileChart({ delivered, remaining }) {
   );
 }
 
+function Pagination({ total, page, onChange, rowsPerPage }) {
+  const totalPages = Math.ceil(total / rowsPerPage);
+  if (totalPages <= 1) return null;
+  return (
+    <div className="flex justify-end p-2 gap-2 text-sm">
+      {[...Array(totalPages)].map((_, i) => (
+        <button
+          key={i}
+          className={`px-2 py-1 rounded border ${
+            page === i + 1 ? "bg-blue-500 text-white" : "bg-white"
+          }`}
+          onClick={() => onChange(i + 1)}
+        >
+          {i + 1}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function MasterProfile() {
   const { id } = useParams();
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const navigate = useNavigate();
 
   const [data, setData] = useState([]);
   const [griege, setGriege] = useState([]);
   const [deliveryData, setDeliveryData] = useState([]);
-  const [loadingDelivery, setLoadingDelivery] = useState(false);
 
-  // Fetch master data
+  const [lotFilter, setLotFilter] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  const [assignedPage, setAssignedPage] = useState(1);
+  const [deliveryPage, setDeliveryPage] = useState(1);
+  const rowsPerPage = 10;
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   useEffect(() => {
-    fetch("https://hcml-ry8s.vercel.app/user/master")
-      .then((res) => res.json())
-      .then((data) => setData(data))
-      .catch((err) => console.error("Failed to fetch master data", err));
-  }, []);
+    setLoading(true);
+    setError("");
+    Promise.all([
+      fetch(`${BASE_URL}/user/master`).then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch master data");
+        return res.json();
+      }),
+      fetch(`${BASE_URL}/demand`).then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch demand data");
+        return res.json();
+      }),
+      fetch(`${BASE_URL}/griegein/delivaryinfo`).then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch delivery info");
+        return res.json();
+      }),
+    ])
+      .then(([masterRes, griegeRes, deliveryRes]) => {
+        setData(masterRes);
+        setGriege(griegeRes);
 
-  // Fetch greige demand
-  useEffect(() => {
-    fetch("https://hcml-ry8s.vercel.app/demand")
-      .then((res) => res.json())
-      .then((data) => setGriege(data))
-      .catch((err) => console.error("Failed to fetch greige data", err));
-  }, []);
-
-  // Fetch and group delivery info by Chalan No and Lot Number
-  useEffect(() => {
-    setLoadingDelivery(true);
-    fetch("https://hcml-ry8s.vercel.app/griegein/delivaryinfo")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 1) {
-          const headers = data[0];
-          const rows = data.slice(1);
-          const formatted = rows
-            .filter((row) => row.length === headers.length)
-            .map((row) =>
-              headers.reduce((obj, key, idx) => {
-                obj[key] = row[idx];
-                return obj;
-              }, {})
-            );
-
-          // ✅ Group by Chalan No and Lot Number and count Than by number of rows
-          const grouped = Object.values(
-            formatted.reduce((acc, curr) => {
-              const key = `${curr["Chalan No"]}-${curr["Lot Number"]}`;
-              if (!acc[key]) {
-                acc[key] = {
-                  Date: curr["Date"],
-                  "Chalan No": curr["Chalan No"],
-                  "Lot Number": curr["Lot Number"],
-                  Type: curr["Type"],
-                  Design: curr["Design"],
-                  Griege: Number(curr["Griege"]) || 0,
-                  Finishing: Number(curr["Finishing"]) || 0,
-                  Than: 1,
-                };
-              } else {
-                acc[key].Griege += Number(curr["Griege"]) || 0;
-                acc[key].Finishing += Number(curr["Finishing"]) || 0;
-                acc[key].Than += 1;
-              }
-              return acc;
-            }, {})
-          );
-
-          setDeliveryData(grouped);
-        } else {
-          setDeliveryData([]);
-        }
+        const headers = deliveryRes[0];
+        const rows = deliveryRes.slice(1);
+        const formatted = rows.map((r) =>
+          headers.reduce((o, h, i) => ({ ...o, [h]: r[i] }), {})
+        );
+        const grouped = Object.values(
+          formatted.reduce((acc, curr) => {
+            const key = `${curr["Chalan No"]}-${curr["Lot Number"]}`;
+            if (!acc[key]) {
+              acc[key] = {
+                ...curr,
+                Griege: +curr.Griege || 0,
+                Finishing: +curr.Finishing || 0,
+                Than: 1,
+              };
+            } else {
+              acc[key].Griege += +curr.Griege || 0;
+              acc[key].Finishing += +curr.Finishing || 0;
+              acc[key].Than += 1;
+            }
+            return acc;
+          }, {})
+        );
+        setDeliveryData(grouped);
+        setLoading(false);
       })
-      .catch(() => setDeliveryData([]))
-      .finally(() => setLoadingDelivery(false));
-  }, []);
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [BASE_URL]);
 
-  const headers = data[0] || [];
-  const rows = data.length > 1 ? data.slice(1) : [];
-  const master = rows.find((row) => row[2]?.toString() === id);
-  const masterName = master ? master[0] : "";
-
-  const assignedLots = useMemo(() => {
-    return griege.filter((item) => item["Master's Name"] === masterName);
-  }, [griege, masterName]);
-
-  const assignedLotNumbers = useMemo(() => {
-    return assignedLots.map((lot) => lot["Lot Number"]);
-  }, [assignedLots]);
-
-  const totalDelivered = useMemo(() => {
-    return deliveryData
-      .filter((item) => assignedLotNumbers.includes(item["Lot Number"]))
-      .reduce((sum, item) => sum + item.Griege, 0);
-  }, [deliveryData, assignedLotNumbers]);
-
-  const totalAssigned = useMemo(() => {
-    return assignedLots.reduce(
-      (sum, item) => sum + (Number(item["Received Grey"]) || 0),
-      0
+  const masterRow = useMemo(() => {
+    if (data.length < 2) return null;
+    const rows = data.slice(1);
+    return rows.find(
+      (row) => row[4]?.toString().trim() === id?.toString().trim()
     );
-  }, [assignedLots]);
+  }, [data, id]);
 
-  const remaining = Math.max(totalAssigned - totalDelivered, 0);
+  const masterName = masterRow?.[0] || "";
+  const masterDeg = masterRow?.[1] || "";
+  const masterMobile = masterRow?.[2] || "";
+  const masterAdd = masterRow?.[3] || "";
+  const masterId = masterRow?.[4] || "";
 
-  if (data.length === 0) {
-    return <div className="p-6 text-center">Loading profile...</div>;
-  }
+  const assignedLots = useMemo(
+    () => griege.filter((i) => i["Master's Name"] === masterName),
+    [griege, masterName]
+  );
+  const assignedLotNumbers = useMemo(
+    () => assignedLots.map((l) => l["Lot Number"]),
+    [assignedLots]
+  );
 
-  if (!master) {
+  const filteredAssigned = useMemo(
+    () =>
+      assignedLots.filter((lot) => {
+        const lotNum = String(lot["Lot Number"] || "");
+        if (
+          lotFilter &&
+          !lotNum.toLowerCase().includes(lotFilter.toLowerCase())
+        )
+          return false;
+
+        const date = new Date(lot.Date);
+        if (fromDate && new Date(fromDate) > date) return false;
+        if (toDate && new Date(toDate) < date) return false;
+        return true;
+      }),
+    [assignedLots, lotFilter, fromDate, toDate]
+  );
+
+  const filteredDelivery = useMemo(
+    () =>
+      deliveryData.filter((item) => {
+        const lotNum = String(item["Lot Number"] || "");
+        if (!assignedLotNumbers.includes(item["Lot Number"])) return false;
+        if (
+          lotFilter &&
+          !lotNum.toLowerCase().includes(lotFilter.toLowerCase())
+        )
+          return false;
+
+        const date = new Date(item.Date);
+        if (fromDate && new Date(fromDate) > date) return false;
+        if (toDate && new Date(toDate) < date) return false;
+        return true;
+      }),
+    [deliveryData, assignedLotNumbers, lotFilter, fromDate, toDate]
+  );
+
+  const totalDelivered = filteredDelivery.reduce((sum, d) => sum + d.Griege, 0);
+  const totalAssigned = filteredAssigned.reduce(
+    (sum, a) => sum + (+a["Received Grey"] || 0),
+    0
+  );
+
+  const pagedAssigned = useMemo(
+    () =>
+      filteredAssigned.slice(
+        (assignedPage - 1) * rowsPerPage,
+        assignedPage * rowsPerPage
+      ),
+    [filteredAssigned, assignedPage]
+  );
+  const pagedDelivery = useMemo(
+    () =>
+      filteredDelivery.slice(
+        (deliveryPage - 1) * rowsPerPage,
+        deliveryPage * rowsPerPage
+      ),
+    [filteredDelivery, deliveryPage]
+  );
+
+  if (loading) {
     return (
-      <div className="p-6 text-red-600 text-center">Master not found!</div>
+      <div className="p-6 text-center text-blue-600 text-xl font-semibold">
+        Loading data...
+      </div>
     );
   }
+
+  if (error) {
+    return (
+      <div className="p-6 text-center text-red-600 font-semibold">
+        Error: {error}
+      </div>
+    );
+  }
+
+  if (!masterRow)
+    return (
+      <div className="p-6 text-center text-red-600 font-semibold">
+        Master not found!
+      </div>
+    );
 
   return (
-    <div className="p-6 mx-auto w-full">
-      {/* Profile Card */}
-      <div className="bg-white shadow-lg rounded-lg p-6 mb-2 border">
-        <h2 className="text-3xl font-bold text-blue-700 text-center mb-6">
-          👤 {masterName}
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {headers.map((title, i) => (
-            <div key={i} className="bg-gray-50 p-4 border rounded-lg shadow-sm">
-              <div className="text-gray-500 text-sm font-semibold">{title}</div>
-              <div className="text-gray-800 text-base font-medium">
-                {master[i]}
-              </div>
-            </div>
+    <div className="p-6 bg-white">
+      <h2 className="text-3xl font-bold text-center mb-6">👤 {masterName}</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-100 rounded-xl shadow-md mb-4">
+        <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm hover:shadow-md transition">
+          <p className="text-sm text-gray-500">Name</p>
+          <p className="text-lg font-semibold text-gray-800">{masterName}</p>
+        </div>
+        <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm hover:shadow-md transition">
+          <p className="text-sm text-gray-500">Designation</p>
+          <p className="text-lg font-semibold text-gray-800">{masterDeg}</p>
+        </div>
+        <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm hover:shadow-md transition">
+          <p className="text-sm text-gray-500">Address</p>
+          <p className="text-lg font-semibold text-gray-800">{masterAdd}</p>
+        </div>
+        <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm hover:shadow-md transition">
+          <p className="text-sm text-gray-500">Mobile</p>
+          <p className="text-lg font-semibold text-gray-800">{masterMobile}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <input
+          type="text"
+          placeholder="Filter by Lot"
+          value={lotFilter}
+          onChange={(e) => setLotFilter(e.target.value)}
+          className="border p-2 rounded"
+        />
+        <input
+          type="date"
+          value={fromDate}
+          onChange={(e) => setFromDate(e.target.value)}
+          className="border p-2 rounded"
+        />
+        <input
+          type="date"
+          value={toDate}
+          onChange={(e) => setToDate(e.target.value)}
+          className="border p-2 rounded"
+        />
+        <button
+          onClick={() => {
+            setLotFilter("");
+            setFromDate("");
+            setToDate("");
+          }}
+          className="bg-gray-300 p-2 rounded"
+        >
+          Clear
+        </button>
+      </div>
+
+      <div className="mb-6">
+        <MasterProfileChart
+          delivered={totalDelivered}
+          remaining={Math.max(totalAssigned - totalDelivered, 0)}
+        />
+      </div>
+
+      <section className="mb-8">
+        <h3 className="text-xl font-bold mb-2">📦 Assigned Lots</h3>
+        <div className="border rounded overflow-hidden">
+          <div className="grid grid-cols-8 bg-blue-100 font-bold text-sm p-2">
+            <div>Date</div>
+            <div>Lot</div>
+            <div className="col-span-2">Party</div>
+            <div>Type</div>
+            <div>Design</div>
+            <div>Received</div>
+            <div>Than</div>
+          </div>
+          {pagedAssigned.map((item, i) => (
+            <Link
+              to={`/admin/dashboard/griege/received/${item["Lot Number"]}`}
+              key={i}
+              className={`grid grid-cols-8 text-sm p-2 ${
+                i % 2 ? "bg-gray-50" : "bg-white"
+              } hover:bg-blue-100`}
+            >
+              <div>{new Date(item.Date).toLocaleDateString()}</div>
+              <div>{item["Lot Number"]}</div>
+              <div className="col-span-2">{item["Party's Name"]}</div>
+              <div>{item.Type}</div>
+              <div>{item.Design}</div>
+              <div>{item["Received Grey"]}</div>
+              <div>{item.Than}</div>
+            </Link>
           ))}
+          <Pagination
+            total={filteredAssigned.length}
+            page={assignedPage}
+            onChange={setAssignedPage}
+            rowsPerPage={rowsPerPage}
+          />
         </div>
-      </div>
+      </section>
 
-      {/* Pie Chart */}
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-2 border w-full  mx-auto">
-        <h3 className="text-xl font-semibold mb-4 text-center text-gray-800">
-          Grey Delivery Status
-        </h3>
-        <MasterProfileChart delivered={totalDelivered} remaining={remaining} />
-        <div className="mt-4 text-center">
-          <p className="font-semibold">Total Assigned: {totalAssigned} yds</p>
-          <p className="text-blue-600">Delivered: {totalDelivered} yds</p>
-          <p className="text-orange-500">Remaining: {remaining} yds</p>
-        </div>
-      </div>
-
-      {/* Assigned Lots */}
-      <div className="mb-2 bg-white p-4 rounded-lg">
-        <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-          📦 Assigned Greige Lots
-        </h3>
-        {assignedLots.length === 0 ? (
-          <div className="p-4 text-gray-500 italic">
-            No lots assigned to this master yet.
-          </div>
-        ) : (
-          <div className="shadow-lg">
-            <div className="grid grid-cols-9 bg-blue-100 font-bold text-sm p-2 rounded-t">
-              <div className="col-span-1">Date</div>
-              <div className="col-span-1">Lot No</div>
-              <div className="col-span-2">Party</div>
-              <div className="col-span-1">Type</div>
-              <div className="col-span-1">Design</div>
-              <div className="col-span-1">Than</div>
-              <div className="col-span-1">Received</div>
-              <div className="col-span-1">Delivered</div>
-            </div>
-            {assignedLots.map((item, i) => {
-              const lotDelivered = deliveryData
-                .filter((d) => d["Lot Number"] === item["Lot Number"])
-                .reduce((sum, d) => sum + d.Griege, 0);
-
-              return (
-                <Link
-                  key={item["Lot Number"] + i}
-                  to={`/admin/dashboard/griege/received/${item["Lot Number"]}`}
-                  className={`grid grid-cols-9 text-sm p-2 transition-all duration-150 hover:bg-blue-600 hover:text-white ${
+      <section>
+        <h3 className="text-xl font-bold mb-2">🚚 Delivery Info</h3>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border text-sm">
+            <thead className="bg-blue-100">
+              <tr>
+                {[
+                  "Date",
+                  "Challan",
+                  "Lot",
+                  "Type",
+                  "Design",
+                  "Than",
+                  "Greige",
+                  "Finishing",
+                ].map((h) => (
+                  <th key={h} className="border px-2 py-1">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {pagedDelivery.map((item, i) => (
+                <tr
+                  key={i}
+                  onClick={() =>
+                    navigate(
+                      `/admin/dashboard/griege/received/${item["Lot Number"]}`
+                    )
+                  }
+                  className={`cursor-pointer ${
                     i % 2 ? "bg-white" : "bg-gray-50"
-                  }`}
+                  } hover:bg-blue-100`}
                 >
-                  <div className="col-span-1">
-                    {new Date(item["Date"]).toLocaleDateString()}
-                  </div>
-                  <div className="col-span-1">{item["Lot Number"]}</div>
-                  <div className="col-span-2">{item["Party's Name"]}</div>
-                  <div className="col-span-1">{item["Type"]}</div>
-                  <div className="col-span-1">{item["Design"]}</div>
-                  <div className="col-span-1">{item["Than"]}</div>
-                  <div className="col-span-1">{item["Received Grey"]}</div>
-                  <div className="col-span-1">{lotDelivered}</div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Delivery Info */}
-      <div className="bg-white p-4 rounded-lg">
-        <h3 className="text-2xl font-semibold text-blue-700 pb-2">
-          🚚 Greige Delivery Details
-        </h3>
-        {loadingDelivery ? (
-          <p className="text-center text-gray-500 py-4">
-            Loading delivery data...
-          </p>
-        ) : deliveryData.filter((item) =>
-            assignedLotNumbers.includes(item["Lot Number"])
-          ).length === 0 ? (
-          <p className="text-center text-gray-500 py-4">No delivery data.</p>
-        ) : (
-          <div className="overflow-x-auto shadow-lg">
-            <table className="min-w-full table-auto border text-sm">
-              <thead className="bg-blue-100">
-                <tr>
-                  <th className="border px-2 py-1">Date</th>
-                  <th className="border px-2 py-1">Challan No</th>
-                  <th className="border px-2 py-1">Lot No</th>
-                  <th className="border px-2 py-1">Type</th>
-                  <th className="border px-2 py-1">Design</th>
-                  <th className="border px-2 py-1">Than</th>
-                  <th className="border px-2 py-1">Greige (yds)</th>
-                  <th className="border px-2 py-1">Finishing (yds)</th>
+                  <td className="border px-2 py-1">
+                    {new Date(item.Date).toLocaleDateString()}
+                  </td>
+                  <td className="border px-2 py-1">{item["Chalan No"]}</td>
+                  <td className="border px-2 py-1">{item["Lot Number"]}</td>
+                  <td className="border px-2 py-1">{item.Type}</td>
+                  <td className="border px-2 py-1">{item.Design}</td>
+                  <td className="border px-2 py-1">{item.Than}</td>
+                  <td className="border px-2 py-1">{item.Griege}</td>
+                  <td className="border px-2 py-1">{item.Finishing}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {deliveryData
-                  .filter((item) =>
-                    assignedLotNumbers.includes(item["Lot Number"])
-                  )
-                  .map((item, i) => (
-                    <tr
-                      key={`${item["Chalan No"]}-${item["Lot Number"]}-${i}`}
-                      className={`text-sm p-2 transition-all duration-150 hover:bg-blue-600 hover:text-white ${
-                        i % 2 ? "bg-white" : "bg-gray-50"
-                      }`}
-                      onClick={() =>
-                        navigate(
-                          `/admin/dashboard/griege/received/${item["Lot Number"]}`
-                        )
-                      }
-                    >
-                      <td className="border px-2 py-1">
-                        {new Date(item.Date).toLocaleDateString("en-GB")}
-                      </td>
-                      <td className="border px-2 py-1">{item["Chalan No"]}</td>
-                      <td className="border px-2 py-1">{item["Lot Number"]}</td>
-                      <td className="border px-2 py-1">{item.Type}</td>
-                      <td className="border px-2 py-1">{item.Design}</td>
-                      <td className="border px-2 py-1">{item.Than}</td>
-                      <td className="border px-2 py-1">{item.Griege}</td>
-                      <td className="border px-2 py-1">{item.Finishing}</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+              ))}
+            </tbody>
+          </table>
+          <Pagination
+            total={filteredDelivery.length}
+            page={deliveryPage}
+            onChange={setDeliveryPage}
+            rowsPerPage={rowsPerPage}
+          />
+        </div>
+      </section>
     </div>
   );
 }

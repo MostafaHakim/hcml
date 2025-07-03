@@ -7,10 +7,10 @@ function DeliveredDyes() {
   const [memoSearch, setMemoSearch] = useState("");
   const [dateSearch, setDateSearch] = useState("");
   const [loading, setLoading] = useState(true);
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   useEffect(() => {
     setLoading(true);
-    fetch(`https://hcml-ry8s.vercel.app/demand/verifydyes`)
+    fetch(`${BASE_URL}/demand/verifydyes`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch data");
         return res.json();
@@ -84,16 +84,13 @@ function DeliveredDyes() {
       };
 
       // Google Apps Script Web App URL-এ POST রিকোয়েস্ট পাঠান
-      const response = await fetch(
-        "https://hcml-ry8s.vercel.app/demand/status",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${BASE_URL}/demand/status`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) {
         throw new Error("গুগল শিটে স্ট্যাটাস আপডেট করতে ব্যর্থ");

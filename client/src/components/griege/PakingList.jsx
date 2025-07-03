@@ -20,14 +20,12 @@ function PackingList() {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const chalanRef = useRef();
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await fetch(
-          "https://hcml-ry8s.vercel.app/griegein/delivaryinfo"
-        );
+        const res = await fetch(`${BASE_URL}/griegein/delivaryinfo`);
         const raw = await res.json();
         const rows = raw.slice(1).filter((r) => r[1]);
 
@@ -94,7 +92,7 @@ function PackingList() {
     }
 
     fetch(
-      `https://hcml-ry8s.vercel.app/griegein/getaddress?party=${encodeURIComponent(
+      `${BASE_URL}/griegein/getaddress?party=${encodeURIComponent(
         matchedData[0][3]
       )}`
     )

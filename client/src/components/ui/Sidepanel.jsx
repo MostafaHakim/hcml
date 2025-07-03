@@ -43,16 +43,20 @@ function Sidepanel({ closeSidebar }) {
       >
         HCML
       </Link>
-      {panelItem.map((element) => {
+      {panelItem.map((element, i) => {
         return (
-          <div className="bg-white bg-opacity-30 border-[1px] border-white shadow-md rounded-md text-black px-1 py-2">
+          <div
+            className="bg-white bg-opacity-30 border-[1px] border-white shadow-md rounded-md text-black px-1 py-2"
+            key={i}
+          >
             <h2 className="uppercase text-sm font-semibold">
               {element.panelName}
             </h2>
             <ul className="flex flex-col items-start text-xs uppercase space-y-1">
-              {element.menuItem.map((item) => {
+              {element.menuItem.map((item, i) => {
                 return (
                   <NavLink
+                    key={i}
                     to={`${element.path}/${item}`}
                     className="hover:bg-white bg-white bg-opacity-50 w-full text-start px-2 py-1 rounded-md "
                   >

@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [data, setData] = useState([]);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+  // যদি আগেই লগইন থাকে তাহলে সরাসরি রিডাইরেক্ট
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     if (isLoggedIn) {
@@ -17,40 +18,44 @@ function Login() {
     }
   }, []);
 
-  useEffect(() => {
-    fetch("https://hcml-ry8s.vercel.app/user")
-      .then((res) => res.json())
-      .then((data) => setData(data))
-      .catch((err) => {
-        console.error("Failed to fetch user data", err);
-        setMessage("Server error. Please try again later.");
-      });
-  }, []);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const user = data.find(
-      (item) =>
-        item["USER NAME"].toLowerCase().trim() ===
-          username.toLowerCase().trim() && String(item["PASSWORD"]) === password
-    );
+    setMessage("Logging in...");
 
-    if (user) {
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("username", user["USER NAME"]);
-      localStorage.setItem("fullName", user["FULL NAME"]);
-      localStorage.setItem("role", user["ROLE"]);
+    try {
+      const response = await fetch(`${BASE_URL}/user/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          password: password,
+        }),
+      });
 
-      if (user["ROLE"] === "Admin") {
-        navigate("/admin");
-      } else if (user["ROLE"] === "Storeman") {
-        navigate("/store");
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("username", result.username);
+        localStorage.setItem("fullName", result.fullName);
+        localStorage.setItem("role", result.role);
+
+        if (result.role === "Admin") {
+          navigate("/admin");
+        } else if (result.role === "Storeman") {
+          navigate("/store");
+        } else {
+          setMessage("Unauthorized role");
+        }
       } else {
-        setMessage("Unauthorized role");
+        setMessage(result.message || "Invalid username or password");
       }
-    } else {
-      setMessage("Invalid username or password");
+    } catch (error) {
+      console.error("Login failed", error);
+      setMessage("Server error. Please try again later.");
     }
   };
 

@@ -9,16 +9,14 @@ function DeliveryChallan() {
   const [searchedChallan, setSearchedChallan] = useState("");
   const [address, setAddress] = useState("");
   const [demand, setDemand] = useState([]);
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   const chalanRef = useRef();
 
   // Fetch data on load
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(
-          "https://hcml-ry8s.vercel.app/griegein/delivaryinfo"
-        );
+        const res = await fetch(`${BASE_URL}/griegein/delivaryinfo`);
         const raw = await res.json();
 
         const rows = raw.slice(1).filter((r) => r[1]);
@@ -40,7 +38,7 @@ function DeliveryChallan() {
   }, []);
 
   useEffect(() => {
-    fetch(`https://hcml-ry8s.vercel.app/demand`)
+    fetch(`${BASE_URL}/demand`)
       .then((res) => res.json())
       .then((data) => {
         setDemand(data);
@@ -55,9 +53,7 @@ function DeliveryChallan() {
 
     const partyName = groupedData[searchedChallan][0][3];
     fetch(
-      `https://hcml-ry8s.vercel.app/griegein/getaddress?party=${encodeURIComponent(
-        partyName
-      )}`
+      `${BASE_URL}/griegein/getaddress?party=${encodeURIComponent(partyName)}`
     )
       .then((res) => res.json())
       .then((data) => setAddress(data?.address || ""))

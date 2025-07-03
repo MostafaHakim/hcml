@@ -5,9 +5,9 @@ function ColorPurchase() {
   const [purchaseData, setPurchaseData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
   useEffect(() => {
-    fetch("https://hcml-ry8s.vercel.app/colorprice/purchase")
+    fetch(`${BASE_URL}/colorprice/purchase`)
       .then((res) => {
         if (!res.ok) throw new Error("Network response was not ok");
         return res.json();
