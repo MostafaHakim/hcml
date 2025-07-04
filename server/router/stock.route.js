@@ -4,7 +4,7 @@ const express = require("express");
 const router = express.Router();
 
 const GAS_BASE_URL =
-  "https://script.google.com/macros/s/AKfycbzb0jNX8NpS27_BA7aWs2_whhQPgirwQ2sDvPq581Z9KpBLNR4tUAqfrwLc-herqSfT/exec";
+  "https://script.google.com/macros/s/AKfycbwXgpEmBQ6OqYSCRVySHSYqMVy7zlegy7_bddbt6aR06_tqgDoQtcIkoHbGJankYang5Q/exec";
 
 // GET: Fetch color list
 router.get("/", async (req, res) => {

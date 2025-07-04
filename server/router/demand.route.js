@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
+const GAS_BASE_URL_STORE =
+  "https://script.google.com/macros/s/AKfycbwhj1xQSi8qi1DmdzkJ1YwM0XrYFZIInHDnUUAvcFDHUtyGz30DcsqhtkcroUhZYo5k/exec";
+const GAS_BASE_URL_GRIEGE = `https://script.google.com/macros/s/AKfycbzeJBBADTL8ePMhvS9GlTO8gX7Z1wcZEWuWHWhChgeCUqlHjmumharewpVr3s757OFXxA/exec`;
+
 router.get("/", async (req, res) => {
   try {
-    const response = await fetch(
-      "https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=demanddata"
-    );
+    const response = await fetch(`${GAS_BASE_URL_GRIEGE}?action=demanddata`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -15,9 +17,7 @@ router.get("/", async (req, res) => {
 });
 router.get("/verifydyes", async (req, res) => {
   try {
-    const response = await fetch(
-      "https://script.google.com/macros/s/AKfycby0mRlZIXzT8quaX3rnthIKAh4Pur1B6CzEPnugZsMhWtmEELcoVgfQQfgB567dHcVhVw/exec?action=verifydyes"
-    );
+    const response = await fetch(`${GAS_BASE_URL_STORE}?action=verifydyes`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -27,9 +27,7 @@ router.get("/verifydyes", async (req, res) => {
 });
 router.get("/recipies", async (req, res) => {
   try {
-    const response = await fetch(
-      "https://script.google.com/macros/s/AKfycby0mRlZIXzT8quaX3rnthIKAh4Pur1B6CzEPnugZsMhWtmEELcoVgfQQfgB567dHcVhVw/exec?action=getrecipies"
-    );
+    const response = await fetch(`${GAS_BASE_URL_STORE}?action=getrecipies`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -41,7 +39,7 @@ router.get("/recipies", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const response = await fetch(
-      "https://script.google.com/macros/s/AKfycby0mRlZIXzT8quaX3rnthIKAh4Pur1B6CzEPnugZsMhWtmEELcoVgfQQfgB567dHcVhVw/exec?action=addcolordemand",
+      `${GAS_BASE_URL_STORE}?action=addcolordemand`,
       {
         method: "POST",
         headers: {
@@ -60,16 +58,13 @@ router.post("/", async (req, res) => {
 });
 router.post("/status", async (req, res) => {
   try {
-    const response = await fetch(
-      "https://script.google.com/macros/s/AKfycby0mRlZIXzT8quaX3rnthIKAh4Pur1B6CzEPnugZsMhWtmEELcoVgfQQfgB567dHcVhVw/exec?action=status",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(req.body),
-      }
-    );
+    const response = await fetch(`${GAS_BASE_URL_STORE}?action=status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req.body),
+    });
 
     const text = await response.text();
     res.send(text);

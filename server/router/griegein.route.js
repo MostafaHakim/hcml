@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
+const GAS_BASE_URL_GRIEGE = `https://script.google.com/macros/s/AKfycbzeJBBADTL8ePMhvS9GlTO8gX7Z1wcZEWuWHWhChgeCUqlHjmumharewpVr3s757OFXxA/exec`;
+
 router.get("/", async (req, res) => {
   try {
-    const response = await fetch(
-      "https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=lotinfo"
-    );
+    const response = await fetch(`${GAS_BASE_URL_GRIEGE}?action=lotinfo`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -16,9 +16,7 @@ router.get("/", async (req, res) => {
 // =============================================================================
 router.get("/than", async (req, res) => {
   try {
-    const response = await fetch(
-      "https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getthan"
-    );
+    const response = await fetch(`${GAS_BASE_URL_GRIEGE}?action=getthan`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -31,7 +29,7 @@ router.get("/delivarythan", async (req, res) => {
   try {
     const { lot } = req.query;
     const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=delivarythan&lot=${lot}`
+      `${GAS_BASE_URL_GRIEGE}?action=delivarythan&lot=${lot}`
     );
     const data = await response.json();
     res.json(data);
@@ -43,9 +41,7 @@ router.get("/delivarythan", async (req, res) => {
 // ===================================================================================================================
 router.get("/party", async (req, res) => {
   try {
-    const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getParties`
-    );
+    const response = await fetch(`${GAS_BASE_URL_GRIEGE}?action=getParties`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -57,9 +53,7 @@ router.get("/getlots", async (req, res) => {
   try {
     const { party } = req.query;
     const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getLots&party=${encodeURIComponent(
-        party
-      )}`
+      `${GAS_BASE_URL_GRIEGE}?action=getLots&party=${encodeURIComponent(party)}`
     );
     const data = await response.json();
     res.json(data);
@@ -72,9 +66,7 @@ router.get("/getlotinfo", async (req, res) => {
   try {
     const { lot } = req.query;
     const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getLotInfo&lot=${encodeURIComponent(
-        lot
-      )}`
+      `${GAS_BASE_URL_GRIEGE}?action=getLotInfo&lot=${encodeURIComponent(lot)}`
     );
     const data = await response.json();
     res.json(data);
@@ -87,7 +79,7 @@ router.get("/colorres", async (req, res) => {
   try {
     const { lot } = req.query;
     const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getColorsByLot&lot=${encodeURIComponent(
+      `${GAS_BASE_URL_GRIEGE}?action=getColorsByLot&lot=${encodeURIComponent(
         lot
       )}`
     );
@@ -103,7 +95,7 @@ router.get("/detailsres", async (req, res) => {
   try {
     const { lot, color } = req.query;
     const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getDetails&lot=${lot}&color=${encodeURIComponent(
+      `${GAS_BASE_URL_GRIEGE}?action=getDetails&lot=${lot}&color=${encodeURIComponent(
         color
       )}`
     );
@@ -118,7 +110,7 @@ router.get("/detailsres", async (req, res) => {
 router.get("/lastchallan", async (req, res) => {
   try {
     const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getNextChallanNumber`
+      `${GAS_BASE_URL_GRIEGE}?action=getNextChallanNumber`
     );
     const data = await response.json();
     res.json(data); // { lastChallan: "DC-250618004" }
@@ -130,9 +122,7 @@ router.get("/lastchallan", async (req, res) => {
 // ==========================Delivary Info==========================================================================
 router.get("/delivaryinfo", async (req, res) => {
   try {
-    const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=delivaryInfo`
-    );
+    const response = await fetch(`${GAS_BASE_URL_GRIEGE}?action=delivaryInfo`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -148,7 +138,7 @@ router.get("/getaddress", async (req, res) => {
   if (!party) return res.status(400).json({ error: "Party name is required" });
 
   try {
-    const url = `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=getAddressByParty&party=${encodeURIComponent(
+    const url = `${GAS_BASE_URL_GRIEGE}?action=getAddressByParty&party=${encodeURIComponent(
       party
     )}`;
     const response = await fetch(url);
@@ -170,16 +160,13 @@ router.get("/getaddress", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=addnewlot`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(req.body),
-      }
-    );
+    const response = await fetch(`${GAS_BASE_URL_GRIEGE}?action=addnewlot`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req.body),
+    });
 
     const text = await response.text();
     res.send(text);
@@ -190,16 +177,13 @@ router.post("/", async (req, res) => {
 });
 router.post("/thanpost", async (req, res) => {
   try {
-    const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=thanpost`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(req.body),
-      }
-    );
+    const response = await fetch(`${GAS_BASE_URL_GRIEGE}?action=thanpost`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req.body),
+    });
 
     const text = await response.text();
     res.send(text);
@@ -211,7 +195,7 @@ router.post("/thanpost", async (req, res) => {
 router.post("/griegeupdate", async (req, res) => {
   try {
     const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=markDelivered`,
+      `${GAS_BASE_URL_GRIEGE}?action=markDelivered`,
       {
         method: "POST",
         headers: {
@@ -230,16 +214,13 @@ router.post("/griegeupdate", async (req, res) => {
 });
 router.post("/delivarydata", async (req, res) => {
   try {
-    const response = await fetch(
-      `https://script.google.com/macros/s/AKfycbzYUQ8_qSdld8h4axOfMgaJ_W3fWfEKpWp5Lv_acdC20DMEL9GJ5umKNTjCm0ZUrM3-Bw/exec?action=delivaryData`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(req.body),
-      }
-    );
+    const response = await fetch(`${GAS_BASE_URL_GRIEGE}?action=delivaryData`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req.body),
+    });
 
     const text = await response.text();
     res.send(text);

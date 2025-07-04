@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const GAS_BASE_URL =
-  "https://script.google.com/macros/s/AKfycby0mRlZIXzT8quaX3rnthIKAh4Pur1B6CzEPnugZsMhWtmEELcoVgfQQfgB567dHcVhVw/exec";
+  "https://script.google.com/macros/s/AKfycbwhj1xQSi8qi1DmdzkJ1YwM0XrYFZIInHDnUUAvcFDHUtyGz30DcsqhtkcroUhZYo5k/exec";
 
 router.get("/", async (req, res) => {
   try {
