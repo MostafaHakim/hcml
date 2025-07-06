@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Menu } from "lucide-react";
 import Sidepanel from "../components/ui/Sidepanel";
+import DashboardContent from "../components/dashboard/DashboardContent";
 
 function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -33,7 +34,8 @@ function Dashboard() {
 
       {/* Main Content */}
       <div className="flex-1 p-2 overflow-y-auto">
-        <Outlet />
+        {console.log("Current Pathname:", location.pathname)}
+        {location.pathname === "/admin/dashboard" ? <DashboardContent /> : <Outlet />}
       </div>
     </div>
   );

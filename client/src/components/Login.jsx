@@ -5,22 +5,23 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ loading state
   const navigate = useNavigate();
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-  // যদি আগেই লগইন থাকে তাহলে সরাসরি রিডাইরেক্ট
+  // ✅ যদি আগেই লগইন থাকে তাহলে সরাসরি রিডাইরেক্ট
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     if (isLoggedIn) {
       const role = localStorage.getItem("role");
-      if (role === "Admin") navigate("/admin");
+      if (role === "Admin" || role === "Director" || role === "MD") navigate("/admin");
       else if (role === "Storeman") navigate("/store");
     }
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     setMessage("Logging in...");
 
     try {
@@ -42,8 +43,10 @@ function Login() {
         localStorage.setItem("username", result.username);
         localStorage.setItem("fullName", result.fullName);
         localStorage.setItem("role", result.role);
+        console.log("Role received from server and stored in localStorage:", result.role);
+        console.log("Role read back from localStorage immediately after setting:", localStorage.getItem("role"));
 
-        if (result.role === "Admin") {
+        if (result.role === "Admin" || result.role === "Director" || result.role === "MD") {
           navigate("/admin");
         } else if (result.role === "Storeman") {
           navigate("/store");
@@ -56,6 +59,8 @@ function Login() {
     } catch (error) {
       console.error("Login failed", error);
       setMessage("Server error. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,6 +82,7 @@ function Login() {
               onChange={(e) => setUsername(e.target.value)}
               className="w-full px-2 py-1 border border-gray-300 rounded"
               required
+              disabled={loading}
             />
           </div>
           <div>
@@ -87,14 +93,26 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-2 py-1 border border-gray-300 rounded"
               required
+              disabled={loading}
             />
           </div>
-          {message && <p className="text-red-500 text-sm">{message}</p>}
+          {message && (
+            <p
+              className={`text-sm ${
+                message.includes("Logging") ? "text-gray-600" : "text-red-500"
+              }`}
+            >
+              {message}
+            </p>
+          )}
           <button
             type="submit"
-            className="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 rounded"
+            className={`w-full ${
+              loading ? "bg-sky-400" : "bg-sky-600 hover:bg-sky-700"
+            } text-white font-semibold py-2 rounded`}
+            disabled={loading}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </div>
       </form>

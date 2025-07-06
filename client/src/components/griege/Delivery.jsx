@@ -308,8 +308,9 @@ function Delivery() {
                           onChange={(e) =>
                             handleLotChange(e.target.value, tIndex)
                           }
+                          disabled={loadingLotInfo}
                         >
-                          <option value="">Select Lot</option>
+                          <option value="">{loadingLotInfo ? "Loading lots..." : "Select Lot"}</option>
                           {lots.map((lot, i) => (
                             <option className="text-sm" key={i} value={lot}>
                               {lot}

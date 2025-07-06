@@ -112,6 +112,8 @@ function DeliveredDyes() {
     } catch (error) {
       console.error("স্ট্যাটাস আপডেটে ত্রুটি:", error);
       alert("ব্যাচ ডেলিভারড হিসেবে চিহ্নিত করতে ব্যর্থ। আবার চেষ্টা করুন।");
+    } finally {
+      setIsMarkingDelivered(false);
     }
   };
 

@@ -225,25 +225,29 @@ function DeliveryChallan() {
           <h3 className="text-xl font-semibold text-gray-800 mb-3">
             All Delivery Challans
           </h3>
-          <div className="space-y-2">
-            {Object.entries(groupedData).map(([chalanNo, rows]) => (
-              <div
-                key={chalanNo}
-                onClick={() => setSearchedChallan(chalanNo)}
-                className="cursor-pointer bg-white hover:bg-blue-50 border border-gray-300 rounded-md p-3 shadow-sm transition grid grid-cols-5 text-left"
-              >
-                <div className="text-md text-gray-900 font-bold col-span-2">
-                  Challan No: {chalanNo}
+          {loading ? (
+            <div className="text-center text-gray-500">Loading challan list...</div>
+          ) : (
+            <div className="space-y-2">
+              {Object.entries(groupedData).map(([chalanNo, rows]) => (
+                <div
+                  key={chalanNo}
+                  onClick={() => setSearchedChallan(chalanNo)}
+                  className="cursor-pointer bg-white hover:bg-blue-50 border border-gray-300 rounded-md p-3 shadow-sm transition grid grid-cols-5 text-left"
+                >
+                  <div className="text-md text-gray-900 font-bold col-span-2">
+                    Challan No: {chalanNo}
+                  </div>
+                  <div className="text-sm text-gray-700 col-span-1">
+                    Date: {new Date(rows[0][0]).toLocaleDateString("en-BD")}
+                  </div>
+                  <div className="text-sm text-gray-700 col-span-2">
+                    Party: {rows[0][3]}
+                  </div>
                 </div>
-                <div className="text-sm text-gray-700 col-span-1">
-                  Date: {new Date(rows[0][0]).toLocaleDateString("en-BD")}
-                </div>
-                <div className="text-sm text-gray-700 col-span-2">
-                  Party: {rows[0][3]}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

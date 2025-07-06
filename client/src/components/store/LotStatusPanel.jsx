@@ -1,8 +1,12 @@
 import React from "react";
-import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-
-ChartJS.register(ArcElement, Tooltip, Legend);
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 const generateColors = (count) => {
   const colors = [
@@ -27,12 +31,10 @@ const LotStatusPanel = ({ lotStatus, watchValues }) => {
 
   if (!lot) return null;
 
-  // Calculate remaining qty for current workType
   const remaining = lotStatus[workType]
     ? lotStatus.initialQty - lotStatus[workType]
     : lotStatus.initialQty;
 
-  // Prepare data for Pie Chart, exclude 'initialQty'
   const workTypeEntries = Object.entries(lotStatus).filter(
     ([key]) => key !== "initialQty"
   );
@@ -46,19 +48,12 @@ const LotStatusPanel = ({ lotStatus, watchValues }) => {
     );
   }
 
-  const chartData = {
-    labels: workTypeEntries.map(
-      ([key, value]) => `${key} - ${value.toFixed(2)} YDS`
-    ),
-    datasets: [
-      {
-        label: "Work Type Qty",
-        data: workTypeEntries.map(([_, value]) => parseFloat(value.toFixed(2))),
-        backgroundColor: generateColors(workTypeEntries.length),
-        borderWidth: 1,
-      },
-    ],
-  };
+  const chartData = workTypeEntries.map(([key, value]) => ({
+    name: key,
+    value: parseFloat(value.toFixed(2)),
+  }));
+
+  const COLORS = generateColors(chartData.length);
 
   return (
     <div className="col-span-3 p-5 bg-white rounded-xl shadow-lg border border-gray-200 text-gray-800">
@@ -93,21 +88,30 @@ const LotStatusPanel = ({ lotStatus, watchValues }) => {
       </div>
 
       <div className="mb-4 h-96 w-full flex flex-col items-center justify-center">
-        <Pie
-          data={chartData}
-          options={{
-            plugins: {
-              legend: { position: "right" },
-              tooltip: {
-                callbacks: {
-                  label: function (tooltipItem) {
-                    return chartData.labels[tooltipItem.dataIndex];
-                  },
-                },
-              },
-            },
-          }}
-        />
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={chartData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              label={({ name, value }) => `${name}: ${value} YDS`}
+            >
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(value, name) => [`${value.toFixed(2)} YDS`, name]}
+            />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
 
       {qty && (

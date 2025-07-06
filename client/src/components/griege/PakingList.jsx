@@ -19,6 +19,8 @@ function PackingList() {
   const [searchedChalan, setSearchedChalan] = useState("");
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 25; // Adjust this value as needed
   const chalanRef = useRef();
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   useEffect(() => {
@@ -165,7 +167,9 @@ function PackingList() {
               <div className="font-bold text-lg text-gray-900">
                 {matchedData[0][3]}
               </div>
-              <div className="text-md text-gray-700">{address}</div>
+              <div className="text-md text-gray-700">
+                {addressLoading ? "Loading address..." : address}
+              </div>
             </div>
             <div>
               <span className="font-bold text-gray-900">Packing List No: </span>

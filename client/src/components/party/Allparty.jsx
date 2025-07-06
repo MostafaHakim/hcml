@@ -5,15 +5,34 @@ import { FaMapMarkerAlt, FaPhoneAlt } from "react-icons/fa";
 function Allparty() {
   const [data, setData] = useState([]);
   const [filterText, setFilterText] = useState("");
+  const [loading, setLoading] = useState(true); // ✅ Added loading state
   const navigate = useNavigate();
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
+    setLoading(true); // ✅ Start loading
     fetch(`${BASE_URL}/party/partydetails`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then((data) => {
-        const withoutHeader = data.slice(1); // Remove header row
-        setData(withoutHeader);
+        if (Array.isArray(data)) {
+          const withoutHeader = data.slice(1); // Remove header row
+          setData(withoutHeader);
+        } else {
+          console.error("Fetched data is not an array:", data);
+          setData([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching party details:", error);
+        setData([]);
+      })
+      .finally(() => {
+        setLoading(false); // ✅ Done loading
       });
   }, []);
 
@@ -56,7 +75,9 @@ function Allparty() {
 
       {/* Party List */}
       <div className="flex flex-col gap-2 mt-2">
-        {filteredData.length === 0 ? (
+        {loading ? (
+          <p className="text-center py-6 text-gray-500">Loading parties...</p>
+        ) : filteredData.length === 0 ? (
           <p className="text-center py-6 text-gray-500">No parties found.</p>
         ) : (
           filteredData.map((party, index) => (

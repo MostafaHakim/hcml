@@ -17,7 +17,10 @@ router.get("/", async (req, res) => {
 router.get("/purchase", async (req, res) => {
   try {
     const response = await fetch(`${GAS_BASE_URL}?action=getpurchase`);
+    console.log("GAS Response Status:", response.status);
+    console.log("GAS Response OK:", response.ok);
     const data = await response.json();
+    console.log("GAS Response Data:", data);
     res.json(data);
   } catch (error) {
     console.error("Error fetching colors:", error);

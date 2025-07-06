@@ -80,6 +80,7 @@ export default function DeliveryForm() {
       return;
     }
 
+    setSubmitting(true);
     fetch(`${BASE_URL}/griegein/thanpost`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -92,6 +93,9 @@ export default function DeliveryForm() {
         setRows([]);
         setFinishingValues({});
         setColorValues({});
+      })
+      .finally(() => {
+        setSubmitting(false);
       });
   };
 
