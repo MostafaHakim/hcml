@@ -22,6 +22,7 @@ const ColorFields = ({
     });
   }, [watchColors, colorPrice]);
 
+  console.log("colorPrice keys:", Object.keys(colorPrice));
   return (
     <div className="mt-4 border p-4 rounded flex flex-col space-y-1">
       <h3 className="font-semibold">Colors</h3>
@@ -33,10 +34,14 @@ const ColorFields = ({
               {...rest}
               inputRef={ref}
               suggestions={Object.keys(colorPrice)}
-              value={watchColors[index]?.colorName}
+              value={watchColors[index]?.colorName || ""}
+              onChange={(e) =>
+                setValue(`colors.${index}.colorName`, e.target.value)
+              }
               className="input border-[1px] border-gray-300 w-full p-2 rounded-md"
               placeholder="Type to search color"
             />
+
             <input
               {...register(`colors.${index}.gram`)}
               placeholder="Gram"

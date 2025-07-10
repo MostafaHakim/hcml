@@ -4,10 +4,11 @@ export default function LotEntryForm() {
   const [partyListOptions, setPartyListOptions] = useState([]);
   const [allData, setAllData] = useState([]);
   const [masterList, setMasterList] = useState([]);
-  const [thans, setThans] = useState([]);
+  const [thans, setThans] = useState([{ value: "" }]);
   const [loading, setLoading] = useState(true);
-  const [submitLoading, setSubmitLoading] = useState(false); // ✅ added
+  const [submitLoading, setSubmitLoading] = useState(false);
   const BASE_URL = import.meta.env.VITE_BASE_URL;
+
   const [form, setForm] = useState({
     lotNo: "",
     date: "",
@@ -16,7 +17,6 @@ export default function LotEntryForm() {
     quality: "",
     unit: "",
     action: [],
-    tempThanGaj: "",
     master: "",
   });
 
@@ -69,17 +69,30 @@ export default function LotEntryForm() {
     }
   };
 
-  const handleAddThan = () => {
-    if (!form.tempThanGaj) return;
-    setThans([...thans, form.tempThanGaj]);
-    setForm({ ...form, tempThanGaj: "" });
+  const handleThanChange = (index, newValue) => {
+    const updated = [...thans];
+    updated[index] = { value: newValue };
+    setThans(updated);
+  };
+
+  // ✅ Fix: generate separate object for each field
+  const addThanFields = (count) => {
+    const newFields = Array.from({ length: count }, () => ({ value: "" }));
+    setThans([...thans, ...newFields]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitLoading(true); // ✅ Start loading
+    setSubmitLoading(true);
 
-    const totalGaj = thans.reduce((sum, val) => sum + parseFloat(val || 0), 0);
+    const validGajList = thans
+      .map((t) => t.value.trim())
+      .filter((v) => v !== "");
+
+    const totalGaj = validGajList.reduce(
+      (sum, val) => sum + parseFloat(val || 0),
+      0
+    );
 
     const lotPayload = {
       lotNo: form.lotNo,
@@ -89,12 +102,12 @@ export default function LotEntryForm() {
       quality: form.quality,
       unit: form.unit,
       master: form.master,
-      than: thans.length.toString(),
+      than: validGajList.length.toString(),
       totalGaj: totalGaj.toString(),
       action: form.action.join(", "),
     };
 
-    const thanDetails = thans.map((gaj) => ({
+    const thanDetails = validGajList.map((gaj) => ({
       lotNo: form.lotNo,
       gaj,
     }));
@@ -129,17 +142,16 @@ export default function LotEntryForm() {
           quality: "",
           unit: "",
           action: [],
-          tempThanGaj: "",
           master: "",
         });
-        setThans([]);
+        setThans([{ value: "" }]);
       } else {
         alert("Failed to save data!");
       }
     } catch (error) {
       alert("Error: " + error.message);
     } finally {
-      setSubmitLoading(false); // ✅ End loading
+      setSubmitLoading(false);
     }
   };
 
@@ -149,6 +161,8 @@ export default function LotEntryForm() {
       rows.map((row) => row[2]).filter((item) => item && item.trim() !== "")
     )
   );
+
+  const validGajList = thans.map((t) => t.value.trim()).filter((v) => v !== "");
 
   if (loading) {
     return (
@@ -230,39 +244,43 @@ export default function LotEntryForm() {
         ))}
       </datalist>
 
+      {/* Than Input Section */}
       <div>
         <label className="block font-semibold mb-1">Thans (Per Gaj)</label>
         <div className="flex gap-2 mb-2">
-          <input
-            type="number"
-            name="tempThanGaj"
-            value={form.tempThanGaj}
-            onChange={handleChange}
-            placeholder="Enter gaj"
-            className="border p-2 flex-1"
-          />
           <button
             type="button"
-            className="bg-green-600 text-white px-4 py-2 rounded"
-            onClick={handleAddThan}
+            onClick={() => addThanFields(10)}
+            className="bg-green-500 text-white px-3 py-1 rounded"
           >
-            Add
+            ➕ Add 10 Fields
+          </button>
+          <button
+            type="button"
+            onClick={() => addThanFields(50)}
+            className="bg-purple-500 text-white px-3 py-1 rounded"
+          >
+            ➕ Add 50 Fields
           </button>
         </div>
-        {thans.length > 0 && (
-          <ul className="list-inside bg-gray-50 p-2 rounded list-none grid grid-cols-10">
-            {thans.map((gaj, idx) => (
-              <li
-                key={idx}
-                className="p-1 border-[1px] text-center border-gray-400"
-              >{`${gaj} +`}</li>
-            ))}
-            <h2 className="p-1 col-span-2 font-bold text-right">{`= ${thans.reduce(
-              (sum, val) => sum + parseFloat(val || 0),
-              0
-            )}`}</h2>
-          </ul>
-        )}
+
+        <div className="grid grid-cols-5 gap-2">
+          {thans.map((than, idx) => (
+            <input
+              key={idx}
+              type="number"
+              value={than.value}
+              onChange={(e) => handleThanChange(idx, e.target.value)}
+              className="border p-2"
+              placeholder={`Than ${idx + 1}`}
+            />
+          ))}
+        </div>
+
+        <div className="mt-2 text-right font-semibold text-blue-600">
+          Total Gaj:{" "}
+          {validGajList.reduce((sum, val) => sum + parseFloat(val || 0), 0)}
+        </div>
       </div>
 
       <input

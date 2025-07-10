@@ -96,7 +96,7 @@ function GriegeReport() {
   return (
     <div className="w-full p-6 bg-gray-50 min-h-screen">
       <h2 className="uppercase py-3 px-4 bg-green-600 text-white rounded-t-lg text-lg font-semibold shadow-md">
-        Report Griege
+        Report Status
       </h2>
 
       <div className="my-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">

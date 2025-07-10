@@ -1,81 +1,60 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from "react";
 
 const AutocompleteInput = ({
-  suggestions,
-  value,
+  inputRef,
+  suggestions = [],
+  value = "",
   onChange,
-  onBlur,
-  name,
-  ...props
+  placeholder = "",
+  className = "",
 }) => {
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filtered, setFiltered] = useState([]);
+  const [showList, setShowList] = useState(false);
 
-  const handleOnChange = (e) => {
-    setShowSuggestions(true);
-    onChange(e); // Forward the event to react-hook-form
-  };
-
-  const handleOnClick = (suggestion) => {
-    // Manually trigger onChange for react-hook-form with the selected value
-    onChange({ target: { name, value: suggestion } });
-    setShowSuggestions(false);
-  };
-
-  const handleOnBlur = (e) => {
-    // Delay hiding suggestions to allow click event to register
-    setTimeout(() => {
-      setShowSuggestions(false);
-    }, 150);
-    if (onBlur) {
-      onBlur(e);
+  useEffect(() => {
+    if (value) {
+      const filteredSuggestions = suggestions.filter((item) =>
+        item.toLowerCase().includes(value.toLowerCase())
+      );
+      setFiltered(filteredSuggestions);
+    } else {
+      setFiltered([]);
     }
+  }, [value, suggestions]);
+
+  const handleSelect = (val) => {
+    onChange({ target: { value: val } }); // simulate change
+    setShowList(false);
   };
 
-  const filteredSuggestions = suggestions.filter(
-    (suggestion) =>
-      suggestion.toLowerCase().indexOf((value || '').toLowerCase()) > -1
-  );
-
-  const SuggestionsListComponent = () => {
-    if (!showSuggestions || !value) {
-      return null;
-    }
-
-    if (filteredSuggestions.length) {
-      return (
-        <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-y-auto">
-          {filteredSuggestions.map((suggestion) => (
+  return (
+    <div className="relative w-full">
+      <input
+        ref={inputRef}
+        value={value}
+        onChange={(e) => {
+          onChange(e);
+          setShowList(true);
+        }}
+        onFocus={() => setShowList(true)}
+        onBlur={() => setTimeout(() => setShowList(false), 150)}
+        placeholder={placeholder}
+        className={className}
+        autoComplete="off"
+      />
+      {showList && filtered.length > 0 && (
+        <ul className="absolute z-10 bg-white border border-gray-300 rounded shadow-md w-full max-h-40 overflow-y-auto">
+          {filtered.map((suggestion, index) => (
             <li
-              key={suggestion}
-              onClick={() => handleOnClick(suggestion)}
-              className="p-2 cursor-pointer hover:bg-gray-100"
+              key={index}
+              onClick={() => handleSelect(suggestion)}
+              className="px-3 py-1 cursor-pointer hover:bg-gray-100"
             >
               {suggestion}
             </li>
           ))}
         </ul>
-      );
-    } else {
-      return (
-        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 p-2">
-          <em>No suggestions available.</em>
-        </div>
-      );
-    }
-  };
-
-  return (
-    <div className="relative">
-      <input
-        type="text"
-        {...props}
-        name={name}
-        value={value || ''}
-        onChange={handleOnChange}
-        onBlur={handleOnBlur}
-        onFocus={() => setShowSuggestions(true)} // Show suggestions when the input is focused
-      />
-      <SuggestionsListComponent />
+      )}
     </div>
   );
 };
