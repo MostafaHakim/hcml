@@ -34,8 +34,11 @@ function Dashboard() {
 
       {/* Main Content */}
       <div className="flex-1 p-2 overflow-y-auto">
-        {console.log("Current Pathname:", location.pathname)}
-        {location.pathname === "/admin/dashboard" ? <DashboardContent /> : <Outlet />}
+        {location.pathname === "/admin/dashboard" ? (
+          <DashboardContent />
+        ) : (
+          <Outlet />
+        )}
       </div>
     </div>
   );

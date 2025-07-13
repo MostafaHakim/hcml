@@ -133,12 +133,18 @@ const DashboardContent = () => {
       setLoading(true);
       console.log("--- STARTING DATA FETCH ---");
       try {
-        const [griegeRes, griegeDeliveredRes, dyesPurchasedRes, colorRes, stockRes] = await Promise.all([
+        const [
+          griegeRes,
+          griegeDeliveredRes,
+          dyesPurchasedRes,
+          colorRes,
+          stockRes,
+        ] = await Promise.all([
           fetch(`${BASE_URL}/demand`),
           fetch(`${BASE_URL}/griegein/delivaryinfo`),
           fetch(`${BASE_URL}/colorprice/purchase`),
           fetch(`${BASE_URL}/color`),
-          fetch(`${BASE_URL}/stock`)
+          fetch(`${BASE_URL}/stock`),
         ]);
 
         console.log("--- API RESPONSES ---");
@@ -148,9 +154,12 @@ const DashboardContent = () => {
         console.log("Color List OK:", colorRes.ok);
         console.log("Stock OK:", stockRes.ok);
 
-        if (!griegeRes.ok) throw new Error(`Failed to fetch Griege/Dyes Used data`);
-        if (!griegeDeliveredRes.ok) throw new Error(`Failed to fetch Griege Delivered data`);
-        if (!dyesPurchasedRes.ok) throw new Error(`Failed to fetch Dyes Purchased data`);
+        if (!griegeRes.ok)
+          throw new Error(`Failed to fetch Griege/Dyes Used data`);
+        if (!griegeDeliveredRes.ok)
+          throw new Error(`Failed to fetch Griege Delivered data`);
+        if (!dyesPurchasedRes.ok)
+          throw new Error(`Failed to fetch Dyes Purchased data`);
         if (!colorRes.ok) throw new Error(`Failed to fetch Color list`);
         if (!stockRes.ok) throw new Error(`Failed to fetch Stock data`);
 
@@ -160,16 +169,24 @@ const DashboardContent = () => {
         const colorData = await colorRes.json();
         const stockData = await stockRes.json();
 
-        console.log("--- RAW DATA LOGS ---");
-        console.log("Raw Demand (Griege Received & Dyes Used):", demandData);
-        console.log("Raw Griege Delivered:", griegeDeliveredData);
-        console.log("Raw Dyes Purchased:", dyesPurchasedData);
-        console.log("Raw Color List:", colorData);
-        console.log("Raw Stock:", stockData);
-
-        const processedGriegeDelivered = Array.isArray(griegeDeliveredData) ? griegeDeliveredData.slice(1).map(row => ({ Date: row[0], Griege: row[7] })) : [];
-        const processedDyesPurchased = Array.isArray(dyesPurchasedData) ? dyesPurchasedData.slice(1).map(row => ({ date: row[0], colorName: row[3], qtyKg: row[4] })) : [];
-        const processedColorList = ["All", ...(Array.isArray(colorData) ? colorData.slice(1).map(item => item[0]) : [])];
+        const processedGriegeDelivered = Array.isArray(griegeDeliveredData)
+          ? griegeDeliveredData
+              .slice(1)
+              .map((row) => ({ Date: row[0], Griege: row[7] }))
+          : [];
+        const processedDyesPurchased = Array.isArray(dyesPurchasedData)
+          ? dyesPurchasedData.slice(1).map((row) => ({
+              date: row[0],
+              colorName: row[3],
+              qtyKg: row[4],
+            }))
+          : [];
+        const processedColorList = [
+          "All",
+          ...(Array.isArray(colorData)
+            ? colorData.slice(1).map((item) => item[0])
+            : []),
+        ];
 
         setGriegeReceived(demandData);
         setDyesUsed(demandData); // Dyes Used data is in the demand endpoint
@@ -177,12 +194,6 @@ const DashboardContent = () => {
         setDyesPurchased(processedDyesPurchased);
         setColorList(processedColorList);
         setDyesAvailable(stockData);
-
-        console.log("--- PROCESSED DATA LOGS ---");
-        console.log("Processed Griege Delivered:", processedGriegeDelivered);
-        console.log("Processed Dyes Purchased:", processedDyesPurchased);
-        console.log("Processed Color List:", processedColorList);
-
       } catch (error) {
         setError(error.message);
         console.error("Error fetching dashboard data:", error);
@@ -203,93 +214,200 @@ const DashboardContent = () => {
     let startDate;
 
     switch (timeFilter) {
-      case "7d": startDate = new Date(now.setDate(now.getDate() - 7)); break;
-      case "15d": startDate = new Date(now.setDate(now.getDate() - 15)); break;
-      case "30d": startDate = new Date(now.setDate(now.getDate() - 30)); break;
-      case "60d": startDate = new Date(now.setDate(now.getDate() - 60)); break;
-      case "90d": startDate = new Date(now.setDate(now.getDate() - 90)); break;
-      case "6m": startDate = new Date(now.setMonth(now.getMonth() - 6)); break;
-      case "1y": startDate = new Date(now.setFullYear(now.getFullYear() - 1)); break;
-      default: startDate = new Date(0);
+      case "7d":
+        startDate = new Date(now.setDate(now.getDate() - 7));
+        break;
+      case "15d":
+        startDate = new Date(now.setDate(now.getDate() - 15));
+        break;
+      case "30d":
+        startDate = new Date(now.setDate(now.getDate() - 30));
+        break;
+      case "60d":
+        startDate = new Date(now.setDate(now.getDate() - 60));
+        break;
+      case "90d":
+        startDate = new Date(now.setDate(now.getDate() - 90));
+        break;
+      case "6m":
+        startDate = new Date(now.setMonth(now.getMonth() - 6));
+        break;
+      case "1y":
+        startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+        break;
+      default:
+        startDate = new Date(0);
     }
 
-    const filterByDate = (item) => new Date(item.Date || item.date) >= startDate;
-    
+    const filterByDate = (item) =>
+      new Date(item.Date || item.date) >= startDate;
+
     const result = {
-      griegeReceived: Array.isArray(griegeReceived) ? griegeReceived.filter(filterByDate) : [],
-      dyesPurchased: Array.isArray(dyesPurchased) ? dyesPurchased.filter(filterByDate).filter(item => selectedColor === "All" || item.colorName === selectedColor) : [],
-      griegeDelivered: Array.isArray(griegeDelivered) ? griegeDelivered.filter(filterByDate) : [],
-      dyesUsed: Array.isArray(dyesUsed) ? dyesUsed.filter(filterByDate).filter(item => selectedColor === "All" || item.ColorName === selectedColor) : [],
-      dyesAvailable: Array.isArray(dyesAvailable) ? dyesAvailable.filter(item => selectedColor === "All" || item["PRODUCT NAME"] === selectedColor) : [],
+      griegeReceived: Array.isArray(griegeReceived)
+        ? griegeReceived.filter(filterByDate)
+        : [],
+      dyesPurchased: Array.isArray(dyesPurchased)
+        ? dyesPurchased
+            .filter(filterByDate)
+            .filter(
+              (item) =>
+                selectedColor === "All" || item.colorName === selectedColor
+            )
+        : [],
+      griegeDelivered: Array.isArray(griegeDelivered)
+        ? griegeDelivered.filter(filterByDate)
+        : [],
+      dyesUsed: Array.isArray(dyesUsed)
+        ? dyesUsed
+            .filter(filterByDate)
+            .filter(
+              (item) =>
+                selectedColor === "All" || item.ColorName === selectedColor
+            )
+        : [],
+      dyesAvailable: Array.isArray(dyesAvailable)
+        ? dyesAvailable.filter(
+            (item) =>
+              selectedColor === "All" || item["PRODUCT NAME"] === selectedColor
+          )
+        : [],
     };
 
     console.log("Filtered Data:", result);
     return result;
-  }, [timeFilter, selectedColor, griegeReceived, dyesPurchased, griegeDelivered, dyesUsed, dyesAvailable]);
+  }, [
+    timeFilter,
+    selectedColor,
+    griegeReceived,
+    dyesPurchased,
+    griegeDelivered,
+    dyesUsed,
+    dyesAvailable,
+  ]);
 
-  const { griegeChartData, dyesChartData, totals, availableDyesChartData } = useMemo(() => {
-    console.log("--- CALCULATING CHART DATA & TOTALS ---");
+  const { griegeChartData, dyesChartData, totals, availableDyesChartData } =
+    useMemo(() => {
+      console.log("--- CALCULATING CHART DATA & TOTALS ---");
 
-    const processData = (data, valueField, dateField = "date") => {
-      const map = new Map();
-      if (!Array.isArray(data)) return [];
-      data.forEach((item) => {
-        const date = new Date(item[dateField]).toLocaleDateString("en-CA");
-        if (!map.has(date)) {
-          map.set(date, { name: new Date(date).toLocaleDateString(), value: 0 });
-        }
-        map.get(date).value += parseFloat(item[valueField]) || 0;
-      });
-      return Array.from(map.values()).sort((a, b) => new Date(a.name) - new Date(b.name));
-    };
+      const processData = (data, valueField, dateField = "date") => {
+        const map = new Map();
+        if (!Array.isArray(data)) return [];
+        data.forEach((item) => {
+          const date = new Date(item[dateField]).toLocaleDateString("en-CA");
+          if (!map.has(date)) {
+            map.set(date, {
+              name: new Date(date).toLocaleDateString(),
+              value: 0,
+            });
+          }
+          map.get(date).value += parseFloat(item[valueField]) || 0;
+        });
+        return Array.from(map.values()).sort(
+          (a, b) => new Date(a.name) - new Date(b.name)
+        );
+      };
 
-    const griegeReceivedData = processData(filteredData.griegeReceived, "Received Grey", "Date");
-    const griegeDeliveredData = processData(filteredData.griegeDelivered, "Griege", "Date");
-    const dyesPurchasedData = processData(filteredData.dyesPurchased, "qtyKg", "date");
-    const dyesUsedData = processData(filteredData.dyesUsed, "Dyes Used", "Date");
+      const griegeReceivedData = processData(
+        filteredData.griegeReceived,
+        "Received Grey",
+        "Date"
+      );
+      const griegeDeliveredData = processData(
+        filteredData.griegeDelivered,
+        "Griege",
+        "Date"
+      );
+      const dyesPurchasedData = processData(
+        filteredData.dyesPurchased,
+        "qtyKg",
+        "date"
+      );
+      const dyesUsedData = processData(
+        filteredData.dyesUsed,
+        "Dyes Used",
+        "Date"
+      );
 
-    const mergeChartData = (arr1, arr2, key1, key2) => {
-      const map = new Map();
-      arr1.forEach(item => map.set(item.name, { name: item.name, [key1]: item.value, [key2]: 0 }));
-      arr2.forEach(item => {
-        if (map.has(item.name)) {
-          map.get(item.name)[key2] = item.value;
-        } else {
-          map.set(item.name, { name: item.name, [key1]: 0, [key2]: item.value });
-        }
-      });
-      return Array.from(map.values()).sort((a, b) => new Date(a.name) - new Date(b.name));
-    };
+      const mergeChartData = (arr1, arr2, key1, key2) => {
+        const map = new Map();
+        arr1.forEach((item) =>
+          map.set(item.name, { name: item.name, [key1]: item.value, [key2]: 0 })
+        );
+        arr2.forEach((item) => {
+          if (map.has(item.name)) {
+            map.get(item.name)[key2] = item.value;
+          } else {
+            map.set(item.name, {
+              name: item.name,
+              [key1]: 0,
+              [key2]: item.value,
+            });
+          }
+        });
+        return Array.from(map.values()).sort(
+          (a, b) => new Date(a.name) - new Date(b.name)
+        );
+      };
 
-    const totals = {
-      griegeReceived: filteredData.griegeReceived.reduce((sum, item) => sum + (parseFloat(item["Received Grey"]) || 0), 0),
-      griegeDelivered: filteredData.griegeDelivered.reduce((sum, item) => sum + (parseFloat(item.Griege) || 0), 0),
-      dyesPurchased: filteredData.dyesPurchased.reduce((sum, item) => sum + (parseFloat(item.qtyKg) || 0), 0),
-      dyesUsed: filteredData.dyesUsed.reduce((sum, item) => sum + (parseFloat(item["Dyes Used"]) || 0), 0),
-      dyesAvailable: filteredData.dyesAvailable.reduce((sum, item) => sum + (parseFloat(item["PRESENT STOCK"]) || 0), 0),
-    };
-    
-    const availableDyesChartData = filteredData.dyesAvailable
-      .map(item => ({ name: item["PRODUCT NAME"], stock: parseFloat(item["PRESENT STOCK"]) / 1000 }))
-      .filter(item => item.stock > 0);
+      const totals = {
+        griegeReceived: filteredData.griegeReceived.reduce(
+          (sum, item) => sum + (parseFloat(item["Received Grey"]) || 0),
+          0
+        ),
+        griegeDelivered: filteredData.griegeDelivered.reduce(
+          (sum, item) => sum + (parseFloat(item.Griege) || 0),
+          0
+        ),
+        dyesPurchased: filteredData.dyesPurchased.reduce(
+          (sum, item) => sum + (parseFloat(item.qtyKg) || 0),
+          0
+        ),
+        dyesUsed: filteredData.dyesUsed.reduce(
+          (sum, item) => sum + (parseFloat(item["Dyes Used"]) || 0),
+          0
+        ),
+        dyesAvailable: filteredData.dyesAvailable.reduce(
+          (sum, item) => sum + (parseFloat(item["PRESENT STOCK"]) || 0),
+          0
+        ),
+      };
 
-    const finalChartData = {
-      griegeChartData: mergeChartData(griegeReceivedData, griegeDeliveredData, 'received', 'delivered'),
-      dyesChartData: mergeChartData(dyesPurchasedData, dyesUsedData, 'purchased', 'used'),
-      totals,
-      availableDyesChartData
-    };
+      const availableDyesChartData = filteredData.dyesAvailable
+        .map((item) => ({
+          name: item["PRODUCT NAME"],
+          stock: parseFloat(item["PRESENT STOCK"]) / 1000,
+        }))
+        .filter((item) => item.stock > 0);
 
-    console.log("Final Chart Data & Totals:", finalChartData);
-    return finalChartData;
-  }, [filteredData]);
+      const finalChartData = {
+        griegeChartData: mergeChartData(
+          griegeReceivedData,
+          griegeDeliveredData,
+          "received",
+          "delivered"
+        ),
+        dyesChartData: mergeChartData(
+          dyesPurchasedData,
+          dyesUsedData,
+          "purchased",
+          "used"
+        ),
+        totals,
+        availableDyesChartData,
+      };
+
+      console.log("Final Chart Data & Totals:", finalChartData);
+      return finalChartData;
+    }, [filteredData]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-sky-600 mx-auto"></div>
-          <h2 className="mt-4 text-xl font-semibold text-gray-700">Loading Dashboard...</h2>
+          <h2 className="mt-4 text-xl font-semibold text-gray-700">
+            Loading Dashboard...
+          </h2>
           <p className="text-gray-500">Fetching latest data</p>
         </div>
       </div>
@@ -300,7 +418,9 @@ const DashboardContent = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-lg text-center">
-          <h2 className="text-2xl font-bold text-red-600">Something Went Wrong</h2>
+          <h2 className="text-2xl font-bold text-red-600">
+            Something Went Wrong
+          </h2>
           <p className="text-gray-600 mt-2">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -317,14 +437,18 @@ const DashboardContent = () => {
     <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Business Overview</h1>
-        <p className="text-gray-500 mt-1">Real-time insights into your operations.</p>
+        <p className="text-gray-500 mt-1">
+          Real-time insights into your operations.
+        </p>
       </header>
 
       <TimeFilter activeFilter={timeFilter} setFilter={setTimeFilter} />
 
       {/* Griege Section */}
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Griege Management</h2>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-6">
+          Griege Management
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <StatCard
             title="Griege Received"
@@ -342,16 +466,42 @@ const DashboardContent = () => {
           />
         </div>
         <div className="bg-white p-6 rounded-xl shadow-lg">
-          <h3 className="text-xl font-semibold mb-4 text-gray-700">Griege Daily Trends</h3>
+          <h3 className="text-xl font-semibold mb-4 text-gray-700">
+            Griege Daily Trends
+          </h3>
           <ResponsiveContainer width="100%" height={350}>
-            <LineChart data={griegeChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+            <LineChart
+              data={griegeChartData}
+              margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
               <XAxis dataKey="name" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip contentStyle={{ borderRadius: "0.75rem", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)", border: "1px solid #e5e7eb" }} />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: "0.75rem",
+                  boxShadow:
+                    "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+                  border: "1px solid #e5e7eb",
+                }}
+              />
               <Legend wrapperStyle={{ paddingTop: "20px" }} />
-              <Line type="monotone" dataKey="received" name="Received" stroke="#10b981" strokeWidth={2} activeDot={{ r: 8 }} />
-              <Line type="monotone" dataKey="delivered" name="Delivered" stroke="#8b5cf6" strokeWidth={2} activeDot={{ r: 8 }} />
+              <Line
+                type="monotone"
+                dataKey="received"
+                name="Received"
+                stroke="#10b981"
+                strokeWidth={2}
+                activeDot={{ r: 8 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="delivered"
+                name="Delivered"
+                stroke="#8b5cf6"
+                strokeWidth={2}
+                activeDot={{ r: 8 }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -360,7 +510,9 @@ const DashboardContent = () => {
       {/* Dyes Section */}
       <section>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-700">Dyes Management</h2>
+          <h2 className="text-2xl font-semibold text-gray-700">
+            Dyes Management
+          </h2>
           <div className="w-64">
             <select
               value={selectedColor}
@@ -400,23 +552,55 @@ const DashboardContent = () => {
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-4 text-gray-700">Dyes Daily Trends</h3>
+            <h3 className="text-xl font-semibold mb-4 text-gray-700">
+              Dyes Daily Trends
+            </h3>
             <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={dyesChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+              <LineChart
+                data={dyesChartData}
+                margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip contentStyle={{ borderRadius: "0.75rem", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)", border: "1px solid #e5e7eb" }} />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: "0.75rem",
+                    boxShadow:
+                      "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+                    border: "1px solid #e5e7eb",
+                  }}
+                />
                 <Legend wrapperStyle={{ paddingTop: "20px" }} />
-                <Line type="monotone" dataKey="purchased" name="Purchased" stroke="#3b82f6" strokeWidth={2} activeDot={{ r: 8 }} />
-                <Line type="monotone" dataKey="used" name="Used" stroke="#f97316" strokeWidth={2} activeDot={{ r: 8 }} />
+                <Line
+                  type="monotone"
+                  dataKey="purchased"
+                  name="Purchased"
+                  stroke="#3b82f6"
+                  strokeWidth={2}
+                  activeDot={{ r: 8 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="used"
+                  name="Used"
+                  stroke="#f97316"
+                  strokeWidth={2}
+                  activeDot={{ r: 8 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold mb-4 text-gray-700">Available Dyes Stock (Kg)</h3>
+            <h3 className="text-xl font-semibold mb-4 text-gray-700">
+              Available Dyes Stock (Kg)
+            </h3>
             <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={availableDyesChartData} layout="vertical" margin={{ top: 5, right: 20, left: 50, bottom: 5 }}>
+              <BarChart
+                data={availableDyesChartData}
+                layout="vertical"
+                margin={{ top: 5, right: 20, left: 50, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" />
                 <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} />

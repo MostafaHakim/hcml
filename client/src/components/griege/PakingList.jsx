@@ -17,6 +17,7 @@ function PackingList() {
   const [groupedData, setGroupedData] = useState({});
   const [searchText, setSearchText] = useState("");
   const [searchedChalan, setSearchedChalan] = useState("");
+  const [addressLoading, setAddressLoading] = useState(false);
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -93,6 +94,7 @@ function PackingList() {
       return;
     }
 
+    setAddressLoading(true); // ✅ Start loading
     fetch(
       `${BASE_URL}/griegein/getaddress?party=${encodeURIComponent(
         matchedData[0][3]
@@ -100,7 +102,8 @@ function PackingList() {
     )
       .then((res) => res.json())
       .then((data) => setAddress(data?.address || ""))
-      .catch(() => setAddress(""));
+      .catch(() => setAddress(""))
+      .finally(() => setAddressLoading(false)); // ✅ Stop loading
   }, [matchedData]);
 
   const groupByLotAndColor = (data) => {

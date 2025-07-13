@@ -7,6 +7,7 @@ function DeliveryChallan() {
   const [groupedData, setGroupedData] = useState({});
   const [searchText, setSearchText] = useState("");
   const [searchedChallan, setSearchedChallan] = useState("");
+  const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState("");
   const [demand, setDemand] = useState([]);
   const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -226,7 +227,9 @@ function DeliveryChallan() {
             All Delivery Challans
           </h3>
           {loading ? (
-            <div className="text-center text-gray-500">Loading challan list...</div>
+            <div className="text-center text-gray-500">
+              Loading challan list...
+            </div>
           ) : (
             <div className="space-y-2">
               {Object.entries(groupedData).map(([chalanNo, rows]) => (
